@@ -352,7 +352,176 @@ describe("three-state cycle", function()
 end)
 
 -- ============================================================
--- Command Toggle Tests (toggle() only, no bullet creation)
+-- Cursor Position Tests
+-- ============================================================
+describe("cursor position", function()
+  local buf
+
+  before_each(function()
+    buf = vim.api.nvim_create_buf(true, false)
+    vim.api.nvim_set_current_buf(buf)
+  end)
+
+  after_each(function()
+    if buf and vim.api.nvim_buf_is_valid(buf) then
+      pcall(vim.api.nvim_buf_delete, buf, { force = true })
+    end
+  end)
+
+  describe("cycle cursor positions", function()
+    it("blank → bullet: col past '- '", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      assert.is_true(vim.fn.col(".") >= 2)
+    end)
+
+    it("non-list text → bullet: col past '- '", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "hello" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      assert.is_true(vim.fn.col(".") >= 2)
+    end)
+
+    it("bullet → checkbox: cursor shifts right by 4", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- buy milk" })
+      vim.fn.cursor(1, 4) -- cursor on 'b'
+      Checkbox.cycle()
+      assert.are.equal("- [ ] buy milk", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+      assert.are.equal(8, vim.fn.col(".")) -- still on 'b', shifted by 4
+    end)
+
+    it("checkbox toggle: cursor stays put", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [ ] todo" })
+      vim.fn.cursor(1, 7) -- cursor on 't'
+      Checkbox.cycle()
+      assert.are.equal("- [x] todo", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+      assert.are.equal(7, vim.fn.col(".")) -- same column
+    end)
+
+    it("check→uncheck: cursor stays put", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [x] done" })
+      vim.fn.cursor(1, 7) -- cursor on 'd'
+      Checkbox.cycle()
+      assert.are.equal("- [ ] done", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+      assert.are.equal(7, vim.fn.col("."))
+    end)
+  end)
+
+  describe("toggle command cursor positions", function()
+    it("checkbox toggle: cursor stays put", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [ ] todo" })
+      vim.fn.cursor(1, 7)
+      Checkbox.toggle()
+      assert.are.equal(7, vim.fn.col("."))
+    end)
+
+    it("add checkbox: cursor shifts right by 4", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- plain" })
+      vim.fn.cursor(1, 4) -- cursor on 'p'
+      Checkbox.toggle()
+      assert.are.equal(8, vim.fn.col(".")) -- still on 'p', shifted by 4
+    end)
+  end)
+
+  describe("continuation cursor positions", function()
+    it("o below: cursor on new line after prefix", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- first" })
+      vim.fn.cursor(1, 1)
+      List.continue("o")
+      -- cursor on line 2, col >= 2 (past "- ")
+      assert.are.equal(2, vim.fn.line("."))
+      assert.is_true(vim.fn.col(".") >= 2)
+    end)
+
+    it("o below ordered: cursor on new line after prefix", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "1. first" })
+      vim.fn.cursor(1, 1)
+      List.continue("o")
+      -- cursor on line 2, col >= 3 (past "2. ")
+      assert.are.equal(2, vim.fn.line("."))
+      assert.is_true(vim.fn.col(".") >= 3)
+    end)
+
+    it("o below empty list: cursor at col 1 on new line", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- " })
+      vim.fn.cursor(1, 1)
+      List.continue("o")
+      assert.are.equal(1, vim.fn.col("."))
+    end)
+
+    it("O above: cursor on line 1 after prefix", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- first" })
+      vim.fn.cursor(1, 1)
+      List.continue("O")
+      -- cursor stays on line 1, col >= 2 (past "- ")
+      assert.are.equal(1, vim.fn.line("."))
+      assert.is_true(vim.fn.col(".") >= 2)
+    end)
+
+    it("O above ordered: cursor after prefix", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "5. item" })
+      vim.fn.cursor(1, 1)
+      List.continue("O")
+      -- cursor on line 1, col >= 3 (past "4. ")
+      assert.are.equal(1, vim.fn.line("."))
+      assert.is_true(vim.fn.col(".") >= 3)
+    end)
+
+    it("O above on line 1: cursor after prefix", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "1. item" })
+      vim.fn.cursor(1, 1)
+      List.continue("O")
+      -- prefix is "1. ", cursor past it
+      assert.are.equal(1, vim.fn.line("."))
+      assert.is_true(vim.fn.col(".") >= 3)
+    end)
+
+    it("CR mid-line: splits line, cursor on new line col 1", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "plain text" })
+      vim.fn.cursor(1, 7)
+      List.continue("<CR>")
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+      assert.are.equal("plain ", lines[1])
+      assert.are.equal("text", lines[2])
+      assert.are.equal(1, vim.fn.col("."))
+      assert.are.equal(2, vim.fn.line("."))
+    end)
+
+    it("CR on empty line: new blank line, col 1", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
+      vim.fn.cursor(1, 1)
+      List.continue("<CR>")
+      assert.are.equal(1, vim.fn.col("."))
+      assert.are.equal(2, vim.fn.line("."))
+    end)
+
+    it("CR on list item: cursor on new line after prefix", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- item" })
+      vim.fn.cursor(1, 1)
+      List.continue("<CR>")
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+      assert.are.equal("- item", lines[1])
+      assert.are.equal("- ", lines[2])
+      assert.are.equal(2, vim.fn.line("."))
+      assert.is_true(vim.fn.col(".") >= 2)
+    end)
+
+    it("CR on empty list item: cursor on new blank line col 1", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- " })
+      vim.fn.cursor(1, 1)
+      List.continue("<CR>")
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+      assert.are.equal("- ", lines[1])
+      assert.are.equal("", lines[2])
+      assert.are.equal(1, vim.fn.col("."))
+      assert.are.equal(2, vim.fn.line("."))
+    end)
+  end)
+end)
+
+-- ============================================================
+-- Toggle Command Tests (toggle() only, no bullet creation)
 -- ============================================================
 describe("toggle command", function()
   local buf

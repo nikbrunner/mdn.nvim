@@ -145,8 +145,17 @@ function M.continue(key)
 
   if not lcontent then
     -- Not a list item — do normal behavior
-    if key == "o" or key == "<CR>" then
-      vim.api.nvim_feedkeys(key, "n", false)
+    if key == "<CR>" then
+      -- In Insert mode, feedkeys("<CR>") inserts literal text.
+      -- Instead, split the line at cursor to simulate a newline.
+      local col = vim.fn.col(".")
+      local before = line:sub(1, col - 1)
+      local after = line:sub(col)
+      vim.api.nvim_set_current_line(before)
+      vim.api.nvim_buf_set_lines(0, lnum, lnum, false, { after })
+      vim.fn.cursor(lnum + 1, 1)
+    elseif key == "o" then
+      vim.api.nvim_feedkeys("o", "n", false)
     elseif key == "O" then
       vim.api.nvim_feedkeys("O", "n", false)
     end
