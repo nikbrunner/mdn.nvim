@@ -1,13 +1,10 @@
--- In this file you define the User commands, i.e. how the user will interact with your plugin.
--- The require() is inside the callback — the main module is only loaded when the user
--- actually invokes the command (lazy-loading).
+-- Mdn.nvim user commands.
+-- The require() is inside callbacks — the main module is only loaded
+-- when the user actually invokes a command (lazy-loading).
 
 local sub_cmds = {
-  hello = function()
-    require("mdn").hello()
-  end,
-  bye = function()
-    require("mdn").bye()
+  toggle = function()
+    require("mdn").toggle_checkbox()
   end,
 }
 
@@ -19,7 +16,7 @@ end
 local function main_cmd(opts)
   local sub_cmd = sub_cmds[opts.args]
   if sub_cmd == nil then
-    vim.notify("Base: invalid subcommand", vim.log.levels.ERROR, { title = "mdn.nvim" })
+    vim.notify("Mdn: unknown subcommand: " .. tostring(opts.args), vim.log.levels.ERROR, { title = "mdn.nvim" })
   else
     sub_cmd()
   end
@@ -27,7 +24,7 @@ end
 
 vim.api.nvim_create_user_command("Mdn", main_cmd, {
   nargs = "?",
-  desc = "Base example command",
+  desc = "Mdn: Markdown utility commands",
   complete = function(arg_lead, _, _)
     return vim
       .iter(sub_cmds_keys)
@@ -37,7 +34,3 @@ vim.api.nvim_create_user_command("Mdn", main_cmd, {
       :totable()
   end,
 })
-
--- RESOURCES:
---  - :help nvim_create_user_command()
---  - https://github.com/lumen-oss/nvim-best-practices?tab=readme-ov-file#speaking_head-user-commands

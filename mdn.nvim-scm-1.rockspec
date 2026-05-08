@@ -1,31 +1,30 @@
----@diagnostic disable: lowercase-global
-
-local _MODREV, _SPECREV = "scm", "-1"
-rockspec_format = "3.0"
-version = _MODREV .. _SPECREV
-
-local user = "nikbrunner"
 package = "mdn.nvim"
-
-description = {
-	summary = "Modern template for Neovim plugin development",
-	detailed = [[
-mdn.nvim is a simple template for Neovim plugin development that provides
-best practices, testing setup, type definitions, and automated workflows.
-  ]],
-	labels = { "neovim", "template", "plugin", "lua", "testing", "mini-test" },
-	homepage = "https://github.com/" .. user .. "/" .. package,
-	license = "MIT",
-}
-
-dependencies = {
-	"lua >= 5.1",
-}
-
+version = "scm-1"
 source = {
-	url = "git://github.com/" .. user .. "/" .. package,
+  url = "git+https://github.com/nikbrunner/mdn.nvim.git",
 }
-
+description = {
+  summary = "Minimal Markdown utilities for Neovim: smart list continuation and checkbox toggling",
+  detailed = [[
+    mdn.nvim provides two focused features for Markdown editing:
+    - Smart list continuation on Enter/o/O (ordered, unordered, task lists)
+    - Checkbox toggling in both Normal and Insert mode
+  ]],
+  homepage = "https://github.com/nikbrunner/mdn.nvim",
+  license = "MIT",
+}
+dependencies = {
+  "lua >= 5.1",
+}
 build = {
-	type = "builtin",
+  type = "builtin",
+  modules = {
+    ["mdn"] = "lua/mdn/init.lua",
+    ["mdn.config"] = "lua/mdn/config.lua",
+    ["mdn.patterns"] = "lua/mdn/patterns.lua",
+    ["mdn.list"] = "lua/mdn/list.lua",
+    ["mdn.checkbox"] = "lua/mdn/checkbox.lua",
+    ["mdn.health"] = "lua/mdn/health.lua",
+    ["mdn.util"] = "lua/mdn/util.lua",
+  },
 }

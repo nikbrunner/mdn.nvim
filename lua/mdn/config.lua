@@ -1,11 +1,25 @@
----@class Base.Config
----@field name string
+---@class Mdn.Config
+---@field auto_continue boolean
+---@field keymaps? Mdn.Keymaps
 local M = {}
 
----@class Base.DefaultOptions
-local defaults = { name = "John Doe" }
+---@class Mdn.DefaultOptions
+---@field auto_continue boolean Automatically continue lists on <CR>/o/O (default: true)
+---@field keymaps Mdn.Keymaps Keymap configuration
 
--- Access config values directly: Config.name
+---@class Mdn.Keymaps
+---@field toggle_checkbox? string Key for toggling checkbox in Normal mode (set to "" to disable)
+---@field toggle_checkbox_insert? string Key for toggling checkbox in Insert mode (set to "" to disable)
+
+local defaults = {
+  auto_continue = true,
+  keymaps = {
+    toggle_checkbox = "<leader>x",
+    toggle_checkbox_insert = "<C-Space>",
+  },
+}
+
+-- Access config values directly: Config.auto_continue, Config.keymaps
 local config = vim.deepcopy(defaults)
 
 -- Created at module load — always available
@@ -19,15 +33,19 @@ setmetatable(M, {
 })
 
 ---Extend the defaults options table with the user options
----@param opts? Base.UserOptions plugin options
+---@param opts? Mdn.Config plugin options
 function M.setup(opts)
   config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), opts or {})
 
   -- Validate config
-  if type(config.name) ~= "string" then
-    local Util = require("mdn.util")
-    Util.error(("Invalid 'name' option: expected string, got %s"):format(type(config.name)))
-    config.name = defaults.name
+  vim.validate("auto_continue", config.auto_continue, "boolean")
+  vim.validate("keymaps", config.keymaps, "table")
+
+  if config.keymaps.toggle_checkbox then
+    vim.validate("keymaps.toggle_checkbox", config.keymaps.toggle_checkbox, "string")
+  end
+  if config.keymaps.toggle_checkbox_insert then
+    vim.validate("keymaps.toggle_checkbox_insert", config.keymaps.toggle_checkbox_insert, "string")
   end
 end
 
