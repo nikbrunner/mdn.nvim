@@ -36,8 +36,9 @@ Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 ### List Continuation (auto_continue = true)
 
 ```
-- item          →  - item       →  - item
-  ^ Enter           - |            - new item  ← cursor
+Before Enter:          After Enter:
+- some text|           - some text
+                       - |
 ```
 
 - Unordered lists (`-`, `*`, `+`): continues with same marker
