@@ -224,9 +224,137 @@ describe("list resolver", function()
 end)
 
 -- ============================================================
--- Checkbox Toggle Tests (buffer-based)
+-- Three-State Cycle Tests (buffer-based)
 -- ============================================================
-describe("checkbox toggle", function()
+describe("three-state cycle", function()
+  local buf
+
+  before_each(function()
+    buf = vim.api.nvim_create_buf(true, false)
+    vim.api.nvim_set_current_buf(buf)
+  end)
+
+  after_each(function()
+    if buf and vim.api.nvim_buf_is_valid(buf) then
+      pcall(vim.api.nvim_buf_delete, buf, { force = true })
+    end
+  end)
+
+  describe("state 1: blank → bullet", function()
+    it("creates bullet on blank line", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("- ", line)
+    end)
+
+    it("creates bullet on whitespace-only line", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "   " })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("- ", line)
+    end)
+
+    it("prepends bullet to non-list text line", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "some text" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("- some text", line)
+    end)
+
+    it("cursor is positioned after '- '", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      assert.are.equal(2, vim.fn.col("."))
+    end)
+  end)
+
+  describe("state 2: bullet → checkbox", function()
+    it("adds checkbox to unordered list item", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- plain item" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("- [ ] plain item", line)
+    end)
+
+    it("adds checkbox to ordered list item", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "1. task" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("1. [ ] task", line)
+    end)
+
+    it("adds checkbox to star marker", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "* item" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("* [ ] item", line)
+    end)
+  end)
+
+  describe("state 3: checkbox toggle", function()
+    it("toggles unchecked to checked", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [ ] todo" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("- [x] todo", line)
+    end)
+
+    it("toggles checked to unchecked", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [x] done" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("- [ ] done", line)
+    end)
+
+    it("toggles uppercase X to unchecked", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [X] done" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("- [ ] done", line)
+    end)
+  end)
+
+  describe("full three-state cycle", function()
+    it("cycles blank → bullet → checkbox → checked", function()
+      -- State 1: blank → bullet
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      assert.are.equal("- ", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+
+      -- Add text to the bullet
+      vim.api.nvim_buf_set_lines(buf, 0, 1, false, { "- buy milk" })
+
+      -- State 2: bullet → checkbox
+      Checkbox.cycle()
+      assert.are.equal("- [ ] buy milk", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+
+      -- State 3: checkbox toggle (unchecked → checked)
+      Checkbox.cycle()
+      assert.are.equal("- [x] buy milk", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+
+      -- State 3 (again): toggle back
+      Checkbox.cycle()
+      assert.are.equal("- [ ] buy milk", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+    end)
+  end)
+end)
+
+-- ============================================================
+-- Command Toggle Tests (toggle() only, no bullet creation)
+-- ============================================================
+describe("toggle command", function()
   local buf
 
   before_each(function()
@@ -249,14 +377,6 @@ describe("checkbox toggle", function()
     assert.are.equal("- [x] todo", line)
   end)
 
-  it("toggles checked to unchecked", function()
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [x] done" })
-    vim.fn.cursor(1, 1)
-    Checkbox.toggle()
-    local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
-    assert.are.equal("- [ ] done", line)
-  end)
-
   it("adds checkbox to list item without one", function()
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- plain item" })
     vim.fn.cursor(1, 1)
@@ -270,17 +390,8 @@ describe("checkbox toggle", function()
     vim.fn.cursor(1, 1)
     local result = Checkbox.toggle()
     assert.is_false(result)
-    -- Line should be unchanged
     local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
     assert.are.equal("plain text", line)
-  end)
-
-  it("toggles checkbox on ordered list item", function()
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "1. [ ] task" })
-    vim.fn.cursor(1, 1)
-    Checkbox.toggle()
-    local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
-    assert.are.equal("1. [x] task", line)
   end)
 end)
 

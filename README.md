@@ -11,16 +11,13 @@
 Most Markdown plugins do too much. mdn.nvim does exactly two things:
 
 1. **Smart list continuation** — press Enter and the next list item appears automatically
-2. **Checkbox toggling** — toggle `[ ]` ↔ `[x]` in Normal or Insert mode
+2. **Three-state checkbox cycle** — `<C-t>` cycles: blank → bullet → checkbox → toggle
 
-That's it. No wikilinks, no tables, no ToC generation. Just the two features you miss most when writing Markdown in vanilla Neovim.
-
-Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template for clean architecture: tests, CI, type annotations, health checks.
+Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 
 ## ⚡️ Requirements
 
 - [Neovim](https://github.com/neovim/neovim) ≥ 0.10
-- Markdown filetype (set automatically for `.md` files)
 
 ## 📦 Installation
 
@@ -34,61 +31,51 @@ Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template for cl
 }
 ```
 
-### vim.pack
-
-```lua
-vim.pack.add("https://github.com/nikbrunner/mdn.nvim")
-require("mdn").setup()
-```
-
 ## 🚀 Usage
 
-### List Continuation
-
-When `auto_continue` is enabled (default), pressing `<CR>`, `o`, or `O` on a list item automatically inserts the next one:
+### List Continuation (auto_continue = true)
 
 ```
 - item          →  - item       →  - item
   ^ Enter           - |            - new item  ← cursor
 ```
 
-- **Unordered lists** (`-`, `*`, `+`): continues with the same marker
-- **Ordered lists** (`1.`, `2)`, ...): auto-increments the number
-- **Task lists** (`- [ ]`): continues with an empty checkbox
-- **Empty items** (`- `): terminates continuation (inserts blank line)
+- Unordered lists (`-`, `*`, `+`): continues with same marker
+- Ordered lists (`1.`, `2)`, ...): auto-increments number
+- Task lists (`- [ ]`): continues with empty checkbox
+- Empty items (`- `): terminates (inserts blank line)
 
-### Checkbox Toggle
+### Checkbox Cycle (`<C-t>`)
 
-| Mode   | Default Key | Command       |
-| ------ | ----------- | ------------- |
-| Normal | `<leader>x` | `:Mdn toggle` |
-| Insert | `<C-Space>` | (built-in)    |
+| Step | Starting line | `<C-t>` result |
+|------|--------------|----------------|
+| 1 | *(blank)* | `- ` |
+| 2 | `- buy milk` | `- [ ] buy milk` |
+| 3 | `- [ ] buy milk` | `- [x] buy milk` |
+| 3' | `- [x] buy milk` | `- [ ] buy milk` |
 
-Toggles:
+Works in both Normal and Insert mode.
 
-- `[ ]` → `[x]` (check)
-- `[x]` → `[ ]` (uncheck)
-- No checkbox → adds `[ ]` after the list marker
+### Commands
+
+| Command | Action |
+|---------|--------|
+| `:Mdn toggle` | Toggle checkbox (no bullet creation) |
 
 ## ⚙️ Configuration
 
 ```lua
 require("mdn").setup({
-  auto_continue = true,           -- enable/disable list continuation
-  keymaps = {
-    toggle_checkbox = "<leader>x",        -- Normal mode key (set to "" to disable)
-    toggle_checkbox_insert = "<C-Space>", -- Insert mode key (set to "" to disable)
-  },
+  auto_continue = true,    -- enable/disable list continuation
+  cycle_key = "<C-t>",     -- three-state cycle key (set to "" to disable)
 })
 ```
 
 ## 📖 Documentation
 
-Full documentation is available with `:help mdn.txt`.
-
-Run `:checkhealth mdn` to verify your setup.
+Full docs: `:help mdn.txt`  |  Health: `:checkhealth mdn`
 
 ## 🙏 Acknowledgments
 
-- [base.nvim](https://github.com/S1M0N38/base.nvim) — the Neovim plugin template this is built on
-- [mdnotes.nvim](https://github.com/ymic9963/mdnotes.nvim) — reference for list continuation and checkbox toggle patterns
+- [base.nvim](https://github.com/S1M0N38/base.nvim) — plugin template
+- [mdnotes.nvim](https://github.com/ymic9963/mdnotes.nvim) — reference patterns

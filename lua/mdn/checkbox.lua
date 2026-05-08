@@ -3,88 +3,88 @@
 local List = require("mdn.list")
 local M = {}
 
----Toggle the checkbox on the current line.
----Handles all three cases:
----  1. [ ] → [x] (check the box)
----  2. [x] → [ ] (uncheck the box)
----  3. No checkbox present, but it's a list item → adds [ ] after the marker
----Returns true if a toggle was performed, false if the line is not a list item.
----@return boolean toggled
-function M.toggle()
+---Three-state cycle: blank → bullet → checkbox → toggle.
+---
+---State 1: Blank or non-list line → insert "- "
+---State 2: List item without checkbox → add "[ ] " after marker
+---State 3: Checkbox present → toggle [ ] ↔ [x]
+---
+---Works in both Normal and Insert mode.
+function M.cycle()
   local lnum = vim.fn.line(".")
   local line = vim.api.nvim_get_current_line()
-  local lcontent = List.resolve_list_content(line)
 
+  -- State 1: Blank or non-list line → create bullet point
+  local lcontent = List.resolve_list_content(line)
   if not lcontent then
-    return false
+    if line:match("^%s*$") then
+      -- Blank line: replace with "- "
+      vim.api.nvim_set_current_line("- ")
+    else
+      -- Non-blank non-list: prepend "- " to turn it into a bullet
+      vim.api.nvim_set_current_line("- " .. line)
+    end
+    vim.fn.cursor(lnum, 3)
+    return
   end
 
   local task_state = List.get_task_state(lcontent.text)
   local cursor_col = vim.fn.col(".")
 
-  if task_state == "unchecked" then
-    -- [ ] → [x]
-    local new_line = line:gsub("%[ %]", "[x]", 1)
-    vim.api.nvim_set_current_line(new_line)
-    -- Cursor changes by 1 (space → x), ie stays in same relative position
-    vim.fn.cursor(lnum, cursor_col)
-  elseif task_state == "checked" then
-    -- [x] → [ ]
-    local new_line = line:gsub("%[[xX]%]", "[ ]", 1)
-    vim.api.nvim_set_current_line(new_line)
+  if task_state then
+    -- State 3: Toggle checkbox [ ] ↔ [x]
+    if task_state == "unchecked" then
+      local new_line = line:gsub("%[ %]", "[x]", 1)
+      vim.api.nvim_set_current_line(new_line)
+    else
+      local new_line = line:gsub("%[[xX]%]", "[ ]", 1)
+      vim.api.nvim_set_current_line(new_line)
+    end
     vim.fn.cursor(lnum, cursor_col)
   else
-    -- No checkbox — add [ ] after the marker
+    -- State 2: Bullet exists, no checkbox → add [ ] after marker
     local marker_with_sep = lcontent.marker .. lcontent.separator
-    -- Escape any special characters for gsub
     local escaped_marker = marker_with_sep:gsub("%p", "%%%1")
     local new_line = line:gsub(escaped_marker .. "%s*", marker_with_sep .. " [ ] ", 1)
     vim.api.nvim_set_current_line(new_line)
-    -- Cursor moves right by 4 (the added " [ ] ")
     vim.fn.cursor(lnum, cursor_col + 4)
   end
-
-  return true
 end
 
----Get the expression result for <Plug> mapping in Insert mode.
----Returns the key sequence to send (or empty string if not a list item).
----@return string
-function M.toggle_expr()
+---Toggle only the checkbox state (no bullet creation).
+---Used by the :Mdn toggle command.
+---Returns true if toggled, false if no checkbox was found.
+---@return boolean
+function M.toggle()
   local line = vim.api.nvim_get_current_line()
   local lcontent = List.resolve_list_content(line)
-
   if not lcontent then
-    return ""
+    return false
   end
 
-  -- In insert mode, we need to manipulate the line and reposition cursor
   local task_state = List.get_task_state(lcontent.text)
-  local cur_col = vim.fn.col(".")
-
-  if task_state == "unchecked" then
-    -- [ ] → [x]: replace space with x
-    -- Find position of the [ in the checkbox
-    local checkbox_start = lcontent.indent:len() + lcontent.marker:len() + lcontent.separator:len() + 2
-    local new_line = line:gsub("%[ %]", "[x]", 1)
-    vim.api.nvim_set_current_line(new_line)
-    vim.fn.cursor(vim.fn.line("."), cur_col)
-    return ""
-  elseif task_state == "checked" then
-    -- [x] → [ ]
-    local new_line = line:gsub("%[[xX]%]", "[ ]", 1)
-    vim.api.nvim_set_current_line(new_line)
-    vim.fn.cursor(vim.fn.line("."), cur_col)
-    return ""
-  else
-    -- Add [ ] after marker
+  if not task_state then
+    -- No checkbox — add [ ] after marker (same as cycle state 2)
+    local lnum = vim.fn.line(".")
+    local cursor_col = vim.fn.col(".")
     local marker_with_sep = lcontent.marker .. lcontent.separator
     local escaped_marker = marker_with_sep:gsub("%p", "%%%1")
     local new_line = line:gsub(escaped_marker .. "%s*", marker_with_sep .. " [ ] ", 1)
     vim.api.nvim_set_current_line(new_line)
-    vim.fn.cursor(vim.fn.line("."), cur_col + 4)
-    return ""
+    vim.fn.cursor(lnum, cursor_col + 4)
+    return true
   end
+
+  -- Toggle existing checkbox
+  local lnum = vim.fn.line(".")
+  local cursor_col = vim.fn.col(".")
+  if task_state == "unchecked" then
+    vim.api.nvim_set_current_line((line:gsub("%[ %]", "[x]", 1)))
+  else
+    vim.api.nvim_set_current_line((line:gsub("%[[xX]%]", "[ ]", 1)))
+  end
+  vim.fn.cursor(lnum, cursor_col)
+  return true
 end
 
 return M

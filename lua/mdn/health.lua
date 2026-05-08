@@ -30,6 +30,12 @@ function M.check()
   else
     vim.health.warn("auto_continue is disabled — list continuation won't work")
   end
+
+  if Config.cycle_key ~= "" then
+    vim.health.ok(("cycle key is set to '%s'"):format(Config.cycle_key))
+  else
+    vim.health.warn("cycle_key is empty — three-state cycle is disabled")
+  end
 end
 
 return M

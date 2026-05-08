@@ -17,7 +17,7 @@ TABLE OF CONTENTS                                          *mdn-contents*
 1. INTRODUCTION                                              *mdn-intro*
 
 mdn.nvim is a minimal Neovim plugin for Markdown editing that provides
-smart list continuation and checkbox toggling.
+smart list continuation and a three-state checkbox cycle.
 
 It's deliberately small — no wikilinks, no tables, no ToC. Just the two
 things you miss most when editing Markdown in Neovim.
@@ -32,10 +32,11 @@ things you miss most when editing Markdown in Neovim.
   - Empty list items terminate continuation
   - Works with indented/nested lists
 
-- Checkbox toggling
-  - Toggle [ ] ↔ [x] in Normal mode via |:Mdn| toggle or keymap
-  - Toggle [ ] ↔ [x] in Insert mode via keymap
-  - Add [ ] to list items that don't have one
+- Three-state checkbox cycle on <C-t>
+  - 1. Blank/non-list line → creates "- " bullet
+  - 2. Bullet exists → adds "[ ] " after marker
+  - 3. Checkbox present → toggles [ ] ↔ [x]
+  - Same key works in both Normal and Insert mode
 
 ==============================================================================
 3. REQUIREMENTS                                        *mdn-requirements*
@@ -72,10 +73,7 @@ DEFAULT CONFIGURATION ~
 >
   require("mdn").setup({
     auto_continue = true,
-    keymaps = {
-      toggle_checkbox = "<leader>x",
-      toggle_checkbox_insert = "<C-Space>",
-    },
+    cycle_key = "<C-t>",
   })
 <
 
@@ -85,29 +83,32 @@ OPTIONS ~
     Automatically continue lists when pressing <CR>, o, or O in
     Markdown buffers. Set to false to disable list continuation.
 
-  keymaps          (table)
-    Keymap configuration. Set individual keys to "" to disable.
+  cycle_key        (string, default: "<C-t>")
+    Key for the three-state bullet/checkbox cycle in both Normal
+    and Insert mode. Set to "" to disable.
+<
 
-    keymaps.toggle_checkbox         (string, default: "<leader>x")
-      Normal mode key for toggling checkboxes.
-
-    keymaps.toggle_checkbox_insert  (string, default: "<C-Space>")
-      Insert mode key for toggling checkboxes.
+CYCLING EXAMPLE ~
+>
+  (blank line)  <C-t>  →  "- "
+  "- buy milk"  <C-t>  →  "- [ ] buy milk"
+  "- [ ] buy milk"  <C-t>  →  "- [x] buy milk"
+  "- [x] buy milk"  <C-t>  →  "- [ ] buy milk"
 <
 
 ==============================================================================
 6. COMMANDS                                                *mdn-commands*
 
 :Mdn toggle ~
-    Toggle the checkbox on the current line.
-    [ ] becomes [x], [x] becomes [ ].
-    If the line is a list item without a checkbox, a [ ] is added.
+    Toggle the checkbox on the current line (or add one if it's a list
+    item without a checkbox). Unlike the keymap cycle, this does NOT
+    create bullet points from blank lines.
 
 ==============================================================================
 7. KEYMAPS                                                  *mdn-keymaps*
 
-All keymaps are buffer-local to Markdown buffers (ftplugin/markdown.lua).
-They are set up automatically when |mdn.setup()| is called.
+All keymaps are buffer-local to Markdown buffers. They are set up
+automatically when |mdn.setup()| is called.
 
 LIST CONTINUATION (when auto_continue = true) ~
 >
@@ -116,15 +117,9 @@ LIST CONTINUATION (when auto_continue = true) ~
   O    (Normal mode)    Continue list above, enter Insert mode
 <
 
-CHECKBOX TOGGLE ~
+CHECKBOX CYCLE ~
 >
-  <leader>x   (Normal mode)    Toggle checkbox on current line
-  <C-Space>   (Insert mode)    Toggle checkbox on current line
-<
-
-You can also use |<Plug>| mappings:
->
-  vim.keymap.set("n", "<Plug>(MdnToggleCheckbox)", "<cmd>Mdn toggle<CR>")
+  <C-t>  (Normal + Insert)  Three-state cycle: blank → bullet → checkbox → toggle
 <
 
 ==============================================================================
@@ -136,17 +131,23 @@ Public functions available after |mdn.setup()|:
 mdn.setup({opts}) ~
     Configure and enable the plugin. See |mdn-config| for options.
 
+                                                                   *mdn.cycle()*
+mdn.cycle() ~
+    Run the three-state cycle on the current line. Works in both
+    Normal and Insert mode.
+
                                                           *mdn.toggle_checkbox()*
 mdn.toggle_checkbox() ~
-    Toggle the checkbox on the current line. Same as |:Mdn| toggle.
+    Toggle the checkbox on the current line (or add one). Same as
+    |:Mdn| toggle. Does not create bullet points.
 
                                                            *mdn.continue_list()*
 mdn.continue_list() ~
-    Insert a new list item below the current line. Same as the `o` keymap.
+    Insert a new list item below the current line.
 
                                                      *mdn.continue_list_above()*
 mdn.continue_list_above() ~
-    Insert a new list item above the current line. Same as the `O` keymap.
+    Insert a new list item above the current line.
 
                                                       *mdn.continue_list_enter()*
 mdn.continue_list_enter() ~
@@ -161,11 +162,10 @@ RUNNING TESTS ~
   make test-one MODULE=mdn     # Run single test file
 <
 
-LINTING & TYPECHECKING ~
+LINTING & FORMATTING ~
 >
   make lint                    # Style check with StyLua
   make format                  # Auto-format with StyLua
-  make typecheck               # Type check with LuaLS
   make check                   # Run all: lint + typecheck + test
 <
 

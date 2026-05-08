@@ -1,25 +1,18 @@
 ---@class Mdn.Config
 ---@field auto_continue boolean
----@field keymaps? Mdn.Keymaps
+---@field cycle_key? string
 local M = {}
 
 ---@class Mdn.DefaultOptions
 ---@field auto_continue boolean Automatically continue lists on <CR>/o/O (default: true)
----@field keymaps Mdn.Keymaps Keymap configuration
-
----@class Mdn.Keymaps
----@field toggle_checkbox? string Key for toggling checkbox in Normal mode (set to "" to disable)
----@field toggle_checkbox_insert? string Key for toggling checkbox in Insert mode (set to "" to disable)
+---@field cycle_key string Key for the three-state cycle: blank → bullet → checkbox → toggle (set to "" to disable)
 
 local defaults = {
   auto_continue = true,
-  keymaps = {
-    toggle_checkbox = "<leader>x",
-    toggle_checkbox_insert = "<C-Space>",
-  },
+  cycle_key = "<C-t>",
 }
 
--- Access config values directly: Config.auto_continue, Config.keymaps
+-- Access config values directly: Config.auto_continue, Config.cycle_key
 local config = vim.deepcopy(defaults)
 
 -- Created at module load — always available
@@ -39,13 +32,8 @@ function M.setup(opts)
 
   -- Validate config
   vim.validate("auto_continue", config.auto_continue, "boolean")
-  vim.validate("keymaps", config.keymaps, "table")
-
-  if config.keymaps.toggle_checkbox then
-    vim.validate("keymaps.toggle_checkbox", config.keymaps.toggle_checkbox, "string")
-  end
-  if config.keymaps.toggle_checkbox_insert then
-    vim.validate("keymaps.toggle_checkbox_insert", config.keymaps.toggle_checkbox_insert, "string")
+  if config.cycle_key then
+    vim.validate("cycle_key", config.cycle_key, "string")
   end
 end
 
