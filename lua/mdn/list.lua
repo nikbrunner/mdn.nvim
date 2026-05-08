@@ -160,6 +160,11 @@ function M.continue(key)
     prefix = M.get_previous_prefix(lcontent)
   end
 
+  -- When <CR> fires from Insert mode, we're already in insert mode —
+  -- don't feed "a" or we'll type a literal "a" on the new line.
+  -- o/O fires from Normal mode, so we need to enter insert mode.
+  local is_insert = (key == "<CR>")
+
   if not prefix then
     -- No continuation — insert empty line
     if key == "o" or key == "<CR>" then
@@ -169,7 +174,9 @@ function M.continue(key)
       vim.api.nvim_buf_set_lines(0, lnum - 1, lnum - 1, false, { "" })
       vim.fn.cursor(lnum, 1)
     end
-    vim.api.nvim_feedkeys("a", "n", false)
+    if not is_insert then
+      vim.api.nvim_feedkeys("a", "n", false)
+    end
     return
   end
 
@@ -181,7 +188,9 @@ function M.continue(key)
     vim.fn.cursor(lnum, #prefix + 1)
   end
 
-  vim.api.nvim_feedkeys("a", "n", false)
+  if not is_insert then
+    vim.api.nvim_feedkeys("a", "n", false)
+  end
 end
 
 return M

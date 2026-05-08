@@ -59,12 +59,13 @@ When `auto_continue` is enabled (default), pressing `<CR>`, `o`, or `O` on a lis
 
 ### Checkbox Toggle
 
-| Mode | Default Key | Command |
-|------|------------|---------|
+| Mode   | Default Key | Command       |
+| ------ | ----------- | ------------- |
 | Normal | `<leader>x` | `:Mdn toggle` |
-| Insert | `<C-Space>` | (built-in) |
+| Insert | `<C-Space>` | (built-in)    |
 
 Toggles:
+
 - `[ ]` → `[x]` (check)
 - `[x]` → `[ ]` (uncheck)
 - No checkbox → adds `[ ]` after the list marker
