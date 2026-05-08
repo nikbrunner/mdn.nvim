@@ -1,7 +1,7 @@
 ---
 name: nvim-init
 description: >
-  Initialize a Neovim plugin project after cloning from base.nvim template. Run
+  Initialize a Neovim plugin project after cloning from mdn.nvim template. Run
   once at the start of development to verify the development environment is set up
   correctly. Use when the user says "init", "setup", "initialize", "check environment",
   "nvim-init", or asks to verify their Neovim plugin development setup. Also use when
@@ -27,7 +27,7 @@ where it left off.
 1. **Metadata** — Extract plugin name and GitHub username
 2. **Requirements** — Verify required tools are installed
 3. **Installation** — Check that the plugin and lazydev.nvim are installed in Neovim, and propose/apply config updates if missing
-4. **Rename** — Replace template placeholders (`base`, `S1M0N38`) with the user's plugin name and GitHub username across all files, then commit
+4. **Rename** — Replace template placeholders (`base`, `nikbrunner`) with the user's plugin name and GitHub username across all files, then commit
 5. **Docs** — Update README.md, doc/<module>.txt, and rockspec with the user's plugin description, replacing template boilerplate with TODO markers where appropriate
 
 ## State file

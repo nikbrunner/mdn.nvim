@@ -1,7 +1,7 @@
 ---@module 'luassert'
 
-local health = require("base.health")
-local base = require("base")
+local health = require("mdn.health")
+local base = require("mdn")
 
 describe("health check", function()
   it("runs with default config without errors", function()

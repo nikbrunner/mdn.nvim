@@ -2,7 +2,7 @@
 -- Whwn user want to open a new ISSUE, they are asked to reproduce their issue in a clean minial environment.
 -- repro directory is a safe place to mess around with various config without affecting your main setup.
 --
--- 1. Clone base.nvim and cd into base.nvim
+-- 1. Clone mdn.nvim and cd into mdn.nvim
 -- 2. Run `nvim -u repro/repro.lua`
 -- 3. Run :checkhealth base
 -- 4. Reproduce the issue
@@ -13,7 +13,7 @@ load(vim.fn.system("curl -s https://raw.githubusercontent.com/folke/lazy.nvim/ma
 
 local plugins = {
   {
-    "S1M0N38/base.nvim",
+    "nikbrunner/mdn.nvim",
     dir = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h"),
     lazy = false,
     opts = {},

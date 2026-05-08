@@ -1,6 +1,6 @@
 ---@module 'luassert'
 
-local base = require("base")
+local base = require("mdn")
 base.setup({})
 
 describe("default options", function()

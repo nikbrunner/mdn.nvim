@@ -9,8 +9,8 @@ local defaults = { name = "John Doe" }
 local config = vim.deepcopy(defaults)
 
 -- Created at module load — always available
-M.augroup = vim.api.nvim_create_augroup("base", { clear = true })
-M.ns = vim.api.nvim_create_namespace("base")
+M.augroup = vim.api.nvim_create_augroup("mdn", { clear = true })
+M.ns = vim.api.nvim_create_namespace("mdn")
 
 setmetatable(M, {
   __index = function(_, key)
@@ -25,7 +25,7 @@ function M.setup(opts)
 
   -- Validate config
   if type(config.name) ~= "string" then
-    local Util = require("base.util")
+    local Util = require("mdn.util")
     Util.error(("Invalid 'name' option: expected string, got %s"):format(type(config.name)))
     config.name = defaults.name
   end

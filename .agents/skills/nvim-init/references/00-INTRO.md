@@ -9,7 +9,7 @@ Display the following to the user (adapt the wording naturally):
 
 ---
 
-👋 Welcome to the **base.nvim** plugin initialization!
+👋 Welcome to the **mdn.nvim** plugin initialization!
 
 This wizard will walk you through setting up your Neovim plugin project in
 **5 steps**:
@@ -19,7 +19,7 @@ This wizard will walk you through setting up your Neovim plugin project in
 | **1. Metadata** | Extract your plugin name and GitHub username from the repository |
 | **2. Requirements** | Verify that Neovim, StyLua, LuaLS, git, and make are installed |
 | **3. Installation** | Set up your Neovim config so the plugin and lazydev.nvim are loaded during development |
-| **4. Rename** | Replace every template placeholder (`base`, `S1M0N38`) with your plugin's actual name |
+| **4. Rename** | Replace every template placeholder (`base`, `nikbrunner`) with your plugin's actual name |
 | **5. Docs** | Update README, vimdoc, and rockspec with your plugin's description |
 
 Each step asks for your confirmation before making changes. You can interrupt

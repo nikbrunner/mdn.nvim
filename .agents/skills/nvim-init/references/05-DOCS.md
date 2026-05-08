@@ -20,12 +20,12 @@ INTRODUCTION, and rockspec `summary`.
 
 ### Sections to keep and update
 
-- **Title and badges** — Replace `base.nvim` with `<plugin>`, replace
-  `S1M0N38` with `<github-username>` in badge URLs. Remove the Reddit badge
+- **Title and badges** — Replace `mdn.nvim` with `<plugin>`, replace
+  `nikbrunner` with `<github-username>` in badge URLs. Remove the Reddit badge
   (template-specific). Update the tagline subtitle.
 - **📦 Installation** — Keep the section structure. Update all plugin name
   references to `<plugin>`. Replace `require("base")` with
-  `require("<module>")`. Update lazydev library reference from `"base.nvim"`
+  `require("<module>")`. Update lazydev library reference from `"mdn.nvim"`
   to `"<plugin>"`.
 
 ### Sections to replace with TODO markers

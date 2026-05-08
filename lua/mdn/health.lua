@@ -3,7 +3,7 @@ local M = {}
 
 ---Validate that config values have expected types
 local function validate_opts_table()
-  local opts = require("base.config")
+  local opts = require("mdn.config")
 
   local ok, err = pcall(function()
     vim.validate({
@@ -19,14 +19,14 @@ local function validate_opts_table()
   end
 end
 
----Health check called by `:checkhealth base`
+---Health check called by `:checkhealth mdn`
 function M.check()
-  vim.health.start("base.nvim")
+  vim.health.start("mdn.nvim")
 
-  if require("base").did_setup then
+  if require("mdn").did_setup then
     vim.health.ok("setup() was called")
   else
-    vim.health.error("setup() was not called. Call require('base').setup({}) in your config.")
+    vim.health.error("setup() was not called. Call require('mdn').setup({}) in your config.")
   end
 
   validate_opts_table()

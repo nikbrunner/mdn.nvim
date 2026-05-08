@@ -1,29 +1,29 @@
 ================================================================================
-INTRODUCTION                                                             *base*
+INTRODUCTION                                                             *mdn*
 
-base.nvim is a template for Neovim plugin development with testing support,
+mdn.nvim is a template for Neovim plugin development with testing support,
 type definitions, and automated workflows.
 
 Links:
-- Changelog: https://github.com/S1M0N38/base.nvim/blob/main/CHANGELOG.md
-- License (MIT): https://github.com/S1M0N38/base.nvim/blob/main/LICENSE
+- Changelog: https://github.com/nikbrunner/mdn.nvim/blob/main/CHANGELOG.md
+- License (MIT): https://github.com/nikbrunner/mdn.nvim/blob/main/LICENSE
 
 Table of contents:
 
-1. FEATURES: What this template provides.                       |base-features|
-2. REQUIREMENTS: Plugin dependencies and setup.             |base-requirements|
-3. INSTALLATION: How to install and use the template.       |base-installation|
-4. CONFIGURATION: Available options and their defaults.           |base-config|
-5. COMMANDS: Commands provided by the template.                 |base-commands|
-6. API: Exposed functions and development interfaces.                |base-api|
-7. DEVELOPMENT: Testing, building, and release workflows.    |base-development|
-8. CI/CD TOKENS: Secrets and tokens for GitHub Actions.       |base-tokens|
-9. TROUBLESHOOTING: Common issues and solutions.         |base-troubleshooting|
+1. FEATURES: What this template provides.                       |mdn-features|
+2. REQUIREMENTS: Plugin dependencies and setup.             |mdn-requirements|
+3. INSTALLATION: How to install and use the template.       |mdn-installation|
+4. CONFIGURATION: Available options and their defaults.           |mdn-config|
+5. COMMANDS: Commands provided by the template.                 |mdn-commands|
+6. API: Exposed functions and development interfaces.                |mdn-api|
+7. DEVELOPMENT: Testing, building, and release workflows.    |mdn-development|
+8. CI/CD TOKENS: Secrets and tokens for GitHub Actions.       |mdn-tokens|
+9. TROUBLESHOOTING: Common issues and solutions.         |mdn-troubleshooting|
 
 ================================================================================
 FEATURES                                                        *base-features*
 
-base.nvim provides a template with the following features:
+mdn.nvim provides a template with the following features:
 
 Plugin Structure: ~
 
@@ -88,7 +88,7 @@ Automation and Workflows: ~
 ================================================================================
 REQUIREMENTS                                                *base-requirements*
 
-Before using base.nvim as a template, ensure you have the following:
+Before using mdn.nvim as a template, ensure you have the following:
 
 - Neovim ≥ 0.12.2
 - StyLua (https://github.com/JohnnyMorganz/StyLua) for code formatting
@@ -106,14 +106,14 @@ Optional: ~
 ================================================================================
 INSTALLATION                                                *base-installation*
 
-base.nvim is primarily designed as a template for creating new plugins.
+mdn.nvim is primarily designed as a template for creating new plugins.
 
 Using as a template: ~
 
 1. Click "Use this template" on GitHub to create a new repository
 2. Clone your new repository and customize for your plugin:
    - Replace "base" with your plugin name throughout the codebase
-   - Replace "S1M0N38" with your GitHub username
+   - Replace "nikbrunner" with your GitHub username
    - Update plugin description and functionality
 Development installation: ~
 
@@ -142,7 +142,7 @@ For development and testing, install using lazy.nvim:
       ft = "lua",
       opts = {
         library = {
-          "base.nvim",
+          "mdn.nvim",
         }
       },
     },
@@ -178,10 +178,10 @@ Example configuration: ~
 ================================================================================
 COMMANDS                                                        *base-commands*
 
-base.nvim provides the following commands for demonstration and testing:
+mdn.nvim provides the following commands for demonstration and testing:
 
 :Base [subcommand] ~
-  Execute a base.nvim subcommand. Available subcommands:
+  Execute a mdn.nvim subcommand. Available subcommands:
   - `hello`: Display greeting message to the user
   - `bye`: Display farewell message to the user
 
@@ -189,7 +189,7 @@ base.nvim provides the following commands for demonstration and testing:
   message will be displayed with usage information.
 
 :checkhealth base ~
-  Run health checks to verify base.nvim setup and configuration.
+  Run health checks to verify mdn.nvim setup and configuration.
   This command validates:
   - Plugin installation and loading
   - Configuration option validation
@@ -199,11 +199,11 @@ base.nvim provides the following commands for demonstration and testing:
 ================================================================================
 API                                                                  *base-api*
 
-base.nvim exposes a minimal API focused on setup and core functionality:
+mdn.nvim exposes a minimal API focused on setup and core functionality:
 
                                                                  *base.setup()*
 base.setup({opts}) ~
-  Set up the plugin with the given options. See |base-config| for
+  Set up the plugin with the given options. See |mdn-config| for
   available options. This is the primary public function exposed by the
   main module.
 
@@ -240,7 +240,7 @@ Usage example: ~
 ================================================================================
 DEVELOPMENT                                                  *base-development*
 
-base.nvim includes a development workflow for plugin creation:
+mdn.nvim includes a development workflow for plugin creation:
 
 Testing: ~
 
@@ -382,7 +382,7 @@ First, run the health check to identify issues:
 If you encounter problems, follow these steps to reproduce the issue
 in a clean environment:
 
-1. Clone base.nvim and cd into the directory
+1. Clone mdn.nvim and cd into the directory
 2. Run `nvim -u repro/repro.lua`
 3. Run `:checkhealth base`
 4. Try to reproduce the issue

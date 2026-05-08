@@ -2,7 +2,7 @@
 --- Definition file for LuaLS type information. Not loaded at runtime.
 --- See: https://luals.github.io/wiki/definition-files/
 
--- lua/base/init.lua -----------------------------------------------------------
+-- lua/mdn/init.lua -----------------------------------------------------------
 
 ---@class Base.Plugin
 ---@field did_setup boolean whether setup() has been called
@@ -10,7 +10,7 @@
 ---@field hello fun(): string Say hello to the user using configured name
 ---@field bye fun(): string Say goodbye to the user using configured name
 
--- lua/base/config.lua ---------------------------------------------------------
+-- lua/mdn/config.lua ---------------------------------------------------------
 
 ---@class Base.Config
 ---@field augroup integer augroup created at module load
@@ -26,7 +26,7 @@
 ---@class Base.Options
 ---@field name string The name of the user to greet (merged from user/default options)
 
--- lua/base/util.lua -----------------------------------------------------------
+-- lua/mdn/util.lua -----------------------------------------------------------
 
 ---@class Base.Util
 ---@field notify fun(msg: string|table, level?: integer) send notification with plugin title
@@ -34,7 +34,7 @@
 ---@field warn fun(msg: string) send warning notification
 ---@field error fun(msg: string) send error notification
 
--- lua/base/health.lua ---------------------------------------------------------
+-- lua/mdn/health.lua ---------------------------------------------------------
 
 ---@class Base.Health
 ---@field check fun() perform health check for the plugin

@@ -2,7 +2,7 @@
 
 This step renames every occurrence of the template placeholder (`base`) to the
 user's actual plugin name, and replaces the template GitHub username
-(`S1M0N38`) with the user's username.
+(`nikbrunner`) with the user's username.
 
 ## Prerequisite: clean working tree
 
@@ -63,7 +63,7 @@ Group by category:
 | `plugin/base.lua` | `plugin/<module>.lua` |
 | `tests/base_spec.lua` | `tests/<module>_spec.lua` |
 | `doc/base.txt` | `doc/<module>.txt` |
-| `base.nvim-scm-1.rockspec` | `<plugin>-scm-1.rockspec` |
+| `mdn.nvim-scm-1.rockspec` | `<plugin>-scm-1.rockspec` |
 
 > `tests/health_spec.lua` keeps its filename — only content is updated.
 
@@ -76,7 +76,7 @@ In **all Lua files** (`lua/`, `plugin/`, `tests/`):
 | `require("base")` / `require('base')` | `require("<module>")` | module requires |
 | `require("base.X")` / `require('base.X')` | `require("<module>.X")` | submodule requires |
 | `"base"` (in augroup/namespace) | `"<module>"` | `nvim_create_augroup`, `nvim_create_namespace` |
-| `"base.nvim"` (in notify title) | `"<plugin>"` | `vim.notify` title |
+| `"mdn.nvim"` (in notify title) | `"<plugin>"` | `vim.notify` title |
 | `Base` (LuaCATS class prefix) | `<Pascal>` | `@class Base.Config` → `@class <Pascal>.Config` |
 | `"Base: invalid subcommand"` | `"<Pascal>: invalid subcommand"` | error messages |
 
@@ -96,14 +96,14 @@ In **`doc/<module>.txt`** (vimdoc):
 | `\|base-*\|` (all help refs) | `\|<module>-*\|` |
 | `:checkhealth base` | `:checkhealth <module>` |
 | `:Base` | `:<command>` |
-| `base.nvim` (prose) | `<plugin>` |
+| `mdn.nvim` (prose) | `<plugin>` |
 
 In **`README.md`**:
 
 | Pattern | Replacement |
 |---|---|
-| `base.nvim` | `<plugin>` |
-| `S1M0N38` | `<github-username>` |
+| `mdn.nvim` | `<plugin>` |
+| `nikbrunner` | `<github-username>` |
 | `:help base` | `:help <module>` |
 | `Base` (command refs) | `<command>` |
 | `require("base")` | `require("<module>")` |
@@ -112,8 +112,8 @@ In **`CONTRIBUTING.md`**:
 
 | Pattern | Replacement |
 |---|---|
-| `base.nvim` | `<plugin>` |
-| `S1M0N38` | `<github-username>` |
+| `mdn.nvim` | `<plugin>` |
+| `nikbrunner` | `<github-username>` |
 | `MODULE=base` | `MODULE=<module>` |
 | `tests/base_spec.lua` | `tests/<module>_spec.lua` |
 | `require("base")` | `require("<module>")` |
@@ -123,23 +123,23 @@ In **`repro/repro.lua`**:
 
 | Pattern | Replacement |
 |---|---|
-| `S1M0N38/base.nvim` | `<github-username>/<plugin>` |
-| `base.nvim` (in comments) | `<plugin>` |
+| `nikbrunner/mdn.nvim` | `<github-username>/<plugin>` |
+| `mdn.nvim` (in comments) | `<plugin>` |
 | `:checkhealth base` | `:checkhealth <module>` |
 
 In **rockspec** (`<plugin>-scm-1.rockspec`):
 
 | Pattern | Replacement |
 |---|---|
-| `S1M0N38` | `<github-username>` |
-| `base.nvim` | `<plugin>` |
-| `base.nvim is a simple template...` | keep text as-is (will be updated in step 5) |
+| `nikbrunner` | `<github-username>` |
+| `mdn.nvim` | `<plugin>` |
+| `mdn.nvim is a simple template...` | keep text as-is (will be updated in step 5) |
 
 In **LICENSE**:
 
 | Pattern | Replacement |
 |---|---|
-| `Copyright (c) 2025 S1M0N38` | `Copyright (c) <year> <github-username>` |
+| `Copyright (c) 2025 nikbrunner` | `Copyright (c) <year> <github-username>` |
 
 ### Files NOT touched
 
@@ -147,7 +147,7 @@ In **LICENSE**:
 - `.tests/` — cache artifacts
 - `.luarc.json` — no `base` references
 - `Makefile` — no hardcoded `base`
-- `.github/workflows/` — no `base` or `S1M0N38` references
+- `.github/workflows/` — no `base` or `nikbrunner` references
 - `tests/minit.lua` — no `base` references
 - `CHANGELOG.md` — leave as-is (will be deleted in step 5)
 - `LICENSE` — updated in this step (copyright holder)
@@ -163,7 +163,7 @@ mv lua/base lua/<module>
 mv plugin/base.lua plugin/<module>.lua
 mv tests/base_spec.lua tests/<module>_spec.lua
 mv doc/base.txt doc/<module>.txt
-mv base.nvim-scm-1.rockspec <plugin>-scm-1.rockspec
+mv mdn.nvim-scm-1.rockspec <plugin>-scm-1.rockspec
 ```
 
 ### b. Content replacements
@@ -174,8 +174,8 @@ strings before shorter ones to avoid partial matches. Recommended order:
 
 1. `require("base.` → `require("<module>.` (submodules first)
 2. `require("base")` → `require("<module>")`
-3. `S1M0N38` → `<github-username>` (before `base.nvim` to avoid double-replace)
-4. `base.nvim` → `<plugin>` (full plugin name before bare `base`)
+3. `nikbrunner` → `<github-username>` (before `mdn.nvim` to avoid double-replace)
+4. `mdn.nvim` → `<plugin>` (full plugin name before bare `base`)
 5. `"base"` (augroup/namespace) → `"<module>"`
 6. `Base` (LuaCATS/classes) → `<Pascal>`
 7. Help tags and vimdoc-specific patterns in `doc/<module>.txt`
@@ -192,7 +192,7 @@ After all renames and replacements, run a verification sweep:
 
 ```bash
 # Check for leftover template references (excluding .agents/, .tests/, CHANGELOG)
-rg -l "S1M0N38" --glob '!.agents/**' --glob '!.tests/**' --glob '!CHANGELOG.md'
+rg -l "nikbrunner" --glob '!.agents/**' --glob '!.tests/**' --glob '!CHANGELOG.md'
 rg -l 'require\("base' --glob '!.agents/**' --glob '!.tests/**'
 rg -l 'require\('"'"'base' --glob '!.agents/**' --glob '!.tests/**'
 ```

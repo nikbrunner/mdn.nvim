@@ -95,7 +95,7 @@ their config, not like a copy-paste from a tutorial.
    ```bash
    rg "dev\s*=\s*\{" <config-dir>/
    ```
-   If the user has `dev = { path = "~/Developer", patterns = { "S1M0N38" } }`,
+   If the user has `dev = { path = "~/Developer", patterns = { "nikbrunner" } }`,
    the proposal should add the GitHub username to `patterns` rather than using
    `dir = "..."` on each plugin spec.
 

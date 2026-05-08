@@ -225,7 +225,7 @@ Using as a template: ~
 1. Click "Use this template" on GitHub to create a new repository
 2. Clone your new repository and customize for your plugin:
    - Replace "base" with your plugin name throughout the codebase
-   - Replace "S1M0N38" with your GitHub username
+   - Replace "nikbrunner" with your GitHub username
    - Update plugin description and functionality
 ```
 

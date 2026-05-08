@@ -1,6 +1,6 @@
-# Contributing to base.nvim
+# Contributing to mdn.nvim
 
-Thank you for your interest in contributing to base.nvim! This template aims to provide a good foundation for Neovim plugin development.
+Thank you for your interest in contributing to mdn.nvim! This template aims to provide a good foundation for Neovim plugin development.
 
 ## Getting Started
 
@@ -21,8 +21,8 @@ Thank you for your interest in contributing to base.nvim! This template aims to 
 ### Clone and verify
 
 ```bash
-git clone https://github.com/S1M0N38/base.nvim.git
-cd base.nvim
+git clone https://github.com/nikbrunner/mdn.nvim.git
+cd mdn.nvim
 make check
 ```
 
@@ -83,8 +83,8 @@ nvim -l tests/minit.lua --minitest tests/base_spec.lua  # Explicit file
 2. Clone your fork locally:
 
 ```bash
-git clone https://github.com/your-username/base.nvim.git
-cd base.nvim
+git clone https://github.com/your-username/mdn.nvim.git
+cd mdn.nvim
 ```
 
 ### Create a Branch
@@ -148,4 +148,4 @@ When reporting bugs, please:
 - **Keep it simple**: Avoid adding complex dependencies or patterns
 - **Document everything**: Both code comments and help documentation
 
-Thank you for helping make base.nvim better! 🚀
+Thank you for helping make mdn.nvim better! 🚀
