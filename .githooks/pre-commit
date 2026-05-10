@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -e
+
+export PATH="$HOME/.local/share/nvim/mason/bin:$PATH"
+
+make lint
+make typecheck
