@@ -672,6 +672,47 @@ describe("list continuation", function()
       local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
       assert.are.equal("", lines[1])
     end)
+
+    it("splits list item at cursor on Enter in middle of text", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- hello world" })
+      vim.fn.cursor(1, 7) -- cursor on 'o', after Enter: "- hell" / "- o world"
+      List.continue("<CR>")
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+      assert.are.equal("- hell", lines[1])
+      assert.are.equal("- o world", lines[2])
+      assert.are.equal(2, vim.fn.line("."))
+      assert.are.equal(3, vim.fn.col(".")) -- past "- "
+    end)
+
+    it("splits task list item at cursor on Enter in middle", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [ ] alpha beta" })
+      vim.fn.cursor(1, 13) -- cursor on 'b' of "beta", so after Enter: "- [ ] alpha " / "- [ ] beta"
+      List.continue("<CR>")
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+      assert.are.equal("- [ ] alpha ", lines[1])
+      assert.are.equal("- [ ] beta", lines[2])
+      assert.are.equal(2, vim.fn.line("."))
+      assert.are.equal(7, vim.fn.col(".")) -- past "- [ ] "
+    end)
+
+    it("does not split when cursor is within the list prefix", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [ ] item" })
+      vim.fn.cursor(1, 3) -- cursor on space of "- ["
+      List.continue("<CR>")
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+      -- Should create empty continuation, not split
+      assert.are.equal("- [ ] item", lines[1])
+      assert.are.equal("- [ ] ", lines[2])
+    end)
+
+    it("splits ordered list item at cursor on Enter in middle", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "1. hello world" })
+      vim.fn.cursor(1, 8) -- cursor on 'o', after Enter: "1. hell" / "2. o world"
+      List.continue("<CR>")
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+      assert.are.equal("1. hell", lines[1])
+      assert.are.equal("2. o world", lines[2])
+    end)
   end)
 end)
 

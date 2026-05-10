@@ -134,6 +134,23 @@ function M.get_previous_prefix(lcontent)
   end
 end
 
+---Calculate the 1-indexed column where user text starts after the list prefix.
+---For "- item" returns 3 (past "- "), for "- [ ] item" returns 7 (past "- [ ] ").
+---@param lcontent MdnListContent
+---@return integer
+local function get_content_start_col(lcontent)
+  local len = #lcontent.indent + #lcontent.marker + 1 -- indent + marker + space
+  if lcontent.separator ~= "" then
+    len = len + #lcontent.separator -- ordered list separator
+  end
+  -- Check if text has a checkbox prefix
+  local task_state = M.get_task_state(lcontent.text)
+  if task_state then
+    len = len + 4 -- "[ ] " or "[x] "
+  end
+  return len + 1
+end
+
 ---Insert a new list item below or above the current line.
 ---@param key '"o"'|'"O"'|'"<CR>"' Which key triggered the continuation
 function M.continue(key)
@@ -190,8 +207,36 @@ function M.continue(key)
   end
 
   if key == "o" or key == "<CR>" then
-    vim.api.nvim_buf_set_lines(0, lnum, lnum, false, { prefix })
-    vim.fn.cursor(lnum + 1, #prefix + 1)
+    -- For <CR> in insert mode: if cursor is past the list prefix area,
+    -- split the line at cursor and continue with the trailing text.
+    -- If cursor is at the end or within the prefix, create empty continuation.
+    if key == "<CR>" then
+      local col = vim.fn.col(".")
+      local content_start = get_content_start_col(lcontent)
+      if col >= content_start then
+        local after = line:sub(col)
+        if after ~= "" then
+          -- Split: keep left of cursor on current line,
+          -- insert prefix + text after cursor on new line
+          local before = line:sub(1, col - 1)
+          vim.api.nvim_set_current_line(before)
+          vim.api.nvim_buf_set_lines(0, lnum, lnum, false, { prefix .. after })
+          vim.fn.cursor(lnum + 1, #prefix + 1)
+        else
+          -- At end of line: create empty continuation
+          vim.api.nvim_buf_set_lines(0, lnum, lnum, false, { prefix })
+          vim.fn.cursor(lnum + 1, #prefix + 1)
+        end
+      else
+        -- Within the marker/checkbox area: create empty continuation
+        vim.api.nvim_buf_set_lines(0, lnum, lnum, false, { prefix })
+        vim.fn.cursor(lnum + 1, #prefix + 1)
+      end
+    else
+      -- o from Normal mode: always create empty continuation below
+      vim.api.nvim_buf_set_lines(0, lnum, lnum, false, { prefix })
+      vim.fn.cursor(lnum + 1, #prefix + 1)
+    end
   elseif key == "O" then
     vim.api.nvim_buf_set_lines(0, lnum - 1, lnum - 1, false, { prefix })
     vim.fn.cursor(lnum, #prefix + 1)
