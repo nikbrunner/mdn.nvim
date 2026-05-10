@@ -175,10 +175,10 @@ function M.continue(key)
   local is_insert = (key == "<CR>")
 
   if not prefix then
-    -- No continuation — insert empty line
+    -- No continuation — clear the empty list item (exit the list)
     if key == "o" or key == "<CR>" then
-      vim.api.nvim_buf_set_lines(0, lnum, lnum, false, { "" })
-      vim.fn.cursor(lnum + 1, 1)
+      vim.api.nvim_buf_set_lines(0, lnum - 1, lnum, false, { "" })
+      vim.fn.cursor(lnum, 1)
     elseif key == "O" then
       vim.api.nvim_buf_set_lines(0, lnum - 1, lnum - 1, false, { "" })
       vim.fn.cursor(lnum, 1)
