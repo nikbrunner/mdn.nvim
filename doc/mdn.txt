@@ -80,34 +80,38 @@ The `mdn.setup()` function configures the plugin with user-provided options.
 DEFAULT CONFIGURATION ~
 >
   require("mdn").setup({
-    auto_continue = true,
-    cycle_key = "<C-t>",
-    bullet_marker = "-",
-    indent_key = "<Tab>",
-    outdent_key = "<S-Tab>",
+    lists = {
+      auto_continue = true,
+      bullet_marker = "-",
+    },
+    mappings = {
+      cycle_key = "<C-t>",
+      indent_key = "<Tab>",
+      outdent_key = "<S-Tab>",
+    },
   })
 <
 
 OPTIONS ~
 >
-  auto_continue    (boolean, default: true)
+  lists.auto_continue    (boolean, default: true)
     Automatically continue lists when pressing <CR>, o, or O in
     Markdown buffers. Set to false to disable list continuation.
 
-  cycle_key        (string, default: "<C-t>")
-    Key for the three-state bullet/checkbox cycle in both Normal
-    and Insert mode. Set to "" to disable.
-
-  bullet_marker    (string, default: "-")
+  lists.bullet_marker    (string, default: "-")
     List marker character used when the cycle key creates a new
     bullet from a blank or non-list line. Accepted values: "-",
     "*", "+".
 
-  indent_key       (string, default: "<Tab>")
+  mappings.cycle_key     (string, default: "<C-t>")
+    Key for the three-state bullet/checkbox cycle in both Normal
+    and Insert mode. Set to "" to disable.
+
+  mappings.indent_key    (string, default: "<Tab>")
     Insert-mode key to indent the current line by 'shiftwidth'
     spaces. Set to "" to disable.
 
-  outdent_key      (string, default: "<S-Tab>")
+  mappings.outdent_key   (string, default: "<S-Tab>")
     Insert-mode key to outdent the current line by removing up
     to 'shiftwidth' leading spaces. Set to "" to disable.
 <

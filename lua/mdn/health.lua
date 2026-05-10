@@ -25,30 +25,30 @@ function M.check()
   end
 
   local Config = require("mdn.config")
-  if Config.auto_continue then
+  if Config.lists.auto_continue then
     vim.health.ok("auto_continue is enabled")
   else
     vim.health.warn("auto_continue is disabled — list continuation won't work")
   end
 
-  if Config.cycle_key ~= "" then
-    vim.health.ok(("cycle key is set to '%s'"):format(Config.cycle_key))
+  if Config.mappings.cycle_key ~= "" then
+    vim.health.ok(("cycle key is set to '%s'"):format(Config.mappings.cycle_key))
   else
     vim.health.warn("cycle_key is empty — three-state cycle is disabled")
   end
 
-  if Config.bullet_marker then
-    vim.health.ok(("bullet marker is '%s'"):format(Config.bullet_marker))
+  if Config.lists.bullet_marker then
+    vim.health.ok(("bullet marker is '%s'"):format(Config.lists.bullet_marker))
   end
 
-  if Config.indent_key ~= "" then
-    vim.health.ok(("indent key is set to '%s'"):format(Config.indent_key))
+  if Config.mappings.indent_key ~= "" then
+    vim.health.ok(("indent key is set to '%s'"):format(Config.mappings.indent_key))
   else
     vim.health.warn("indent_key is empty — indent is disabled")
   end
 
-  if Config.outdent_key ~= "" then
-    vim.health.ok(("outdent key is set to '%s'"):format(Config.outdent_key))
+  if Config.mappings.outdent_key ~= "" then
+    vim.health.ok(("outdent key is set to '%s'"):format(Config.mappings.outdent_key))
   else
     vim.health.warn("outdent_key is empty — outdent is disabled")
   end

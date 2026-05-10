@@ -10,12 +10,12 @@ local M = {}
 ---State 2: List item without checkbox → add "[ ] " after marker
 ---State 3: Checkbox present → toggle [ ] ↔ [x]
 ---
----Uses Config.bullet_marker for the bullet character (default: "-").
+---Uses Config.lists.bullet_marker for the bullet character (default: "-").
 ---Works in both Normal and Insert mode.
 function M.cycle()
   local lnum = vim.fn.line(".")
   local line = vim.api.nvim_get_current_line()
-  local marker = Config.bullet_marker .. " "
+  local marker = Config.lists.bullet_marker .. " "
 
   -- State 1: Blank or non-list line → create bullet point
   local lcontent = List.resolve_list_content(line)

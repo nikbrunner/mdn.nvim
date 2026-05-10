@@ -1,27 +1,30 @@
 ---@class Mdn.Config
----@field auto_continue boolean
----@field cycle_key? string
----@field bullet_marker? string
----@field indent_key? string
----@field outdent_key? string
+---@field lists? Mdn.ListsOptions
+---@field mappings? Mdn.MappingsOptions
 local M = {}
 
----@class Mdn.DefaultOptions
+---@class Mdn.ListsOptions
 ---@field auto_continue boolean Automatically continue lists on <CR>/o/O (default: true)
----@field cycle_key string Key for the three-state cycle: blank → bullet → checkbox → toggle (set to "" to disable)
----@field bullet_marker string List marker used when creating new bullets via cycle (default: "-")
----@field indent_key string Insert-mode key for indenting current line (default: "<Tab>")
----@field outdent_key string Insert-mode key for outdenting current line (default: "<S-Tab>")
+---@field bullet_marker string List marker for new bullets (default: "-")
+
+---@class Mdn.MappingsOptions
+---@field cycle_key string Key for three-state cycle: blank → bullet → checkbox → toggle (set to "" to disable)
+---@field indent_key string Insert-mode key for indenting current line (set to "" to disable)
+---@field outdent_key string Insert-mode key for outdenting current line (set to "" to disable)
 
 local defaults = {
-  auto_continue = true,
-  cycle_key = "<C-t>",
-  bullet_marker = "-",
-  indent_key = "<Tab>",
-  outdent_key = "<S-Tab>",
+  lists = {
+    auto_continue = true,
+    bullet_marker = "-",
+  },
+  mappings = {
+    cycle_key = "<C-t>",
+    indent_key = "<Tab>",
+    outdent_key = "<S-Tab>",
+  },
 }
 
--- Access config values directly: Config.auto_continue, Config.cycle_key
+-- Access nested config values: Config.lists.bullet_marker, Config.mappings.indent_key, etc.
 local config = vim.deepcopy(defaults)
 
 -- Created at module load — always available
@@ -40,18 +43,18 @@ function M.setup(opts)
   config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), opts or {})
 
   -- Validate config
-  vim.validate("auto_continue", config.auto_continue, "boolean")
-  if config.cycle_key then
-    vim.validate("cycle_key", config.cycle_key, "string")
+  vim.validate("auto_continue", config.lists.auto_continue, "boolean")
+  if config.mappings.cycle_key then
+    vim.validate("cycle_key", config.mappings.cycle_key, "string")
   end
-  if config.bullet_marker then
-    vim.validate("bullet_marker", config.bullet_marker, "string")
+  if config.lists.bullet_marker then
+    vim.validate("bullet_marker", config.lists.bullet_marker, "string")
   end
-  if config.indent_key then
-    vim.validate("indent_key", config.indent_key, "string")
+  if config.mappings.indent_key then
+    vim.validate("indent_key", config.mappings.indent_key, "string")
   end
-  if config.outdent_key then
-    vim.validate("outdent_key", config.outdent_key, "string")
+  if config.mappings.outdent_key then
+    vim.validate("outdent_key", config.mappings.outdent_key, "string")
   end
 end
 

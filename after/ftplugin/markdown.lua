@@ -17,7 +17,7 @@ vim.schedule(function()
   local Config = require("mdn.config")
 
   -- List continuation (only when auto_continue is enabled)
-  if Config.auto_continue then
+  if Config.lists.auto_continue then
     vim.keymap.set("i", "<CR>", function()
       require("mdn.list").continue("<CR>")
     end, {
@@ -42,8 +42,8 @@ vim.schedule(function()
 
   -- Three-state cycle: blank → bullet → checkbox → toggle
   -- Same key in both Normal and Insert mode
-  if Config.cycle_key ~= "" then
-    vim.keymap.set({ "n", "i" }, Config.cycle_key, function()
+  if Config.mappings.cycle_key ~= "" then
+    vim.keymap.set({ "n", "i" }, Config.mappings.cycle_key, function()
       require("mdn.checkbox").cycle()
     end, {
       buffer = true,
@@ -52,8 +52,8 @@ vim.schedule(function()
   end
 
   -- Insert-mode indent / outdent
-  if Config.indent_key ~= "" then
-    vim.keymap.set("i", Config.indent_key, function()
+  if Config.mappings.indent_key ~= "" then
+    vim.keymap.set("i", Config.mappings.indent_key, function()
       require("mdn.indent").indent()
     end, {
       buffer = true,
@@ -61,8 +61,8 @@ vim.schedule(function()
     })
   end
 
-  if Config.outdent_key ~= "" then
-    vim.keymap.set("i", Config.outdent_key, function()
+  if Config.mappings.outdent_key ~= "" then
+    vim.keymap.set("i", Config.mappings.outdent_key, function()
       require("mdn.indent").outdent()
     end, {
       buffer = true,

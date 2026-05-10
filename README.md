@@ -70,11 +70,15 @@ Works in both Normal and Insert mode.
 
 ```lua
 require("mdn").setup({
-  auto_continue = true,      -- enable/disable list continuation
-  cycle_key = "<C-t>",       -- three-state cycle key (set to "" to disable)
-  bullet_marker = "-",       -- marker for new bullets ("-", "*", "+")
-  indent_key = "<Tab>",      -- insert-mode indent key (set to "" to disable)
-  outdent_key = "<S-Tab>",   -- insert-mode outdent key (set to "" to disable)
+    lists = {
+        auto_continue = true,      -- enable/disable list continuation
+        bullet_marker = "-",       -- marker for new bullets ("-", "*", "+")
+    },
+    mappings = {
+      cycle_key = "<C-t>",       -- three-state cycle key (set to "" to disable)
+      indent_key = "<Tab>",      -- insert-mode indent key (set to "" to disable)
+      outdent_key = "<S-Tab>",   -- insert-mode outdent key (set to "" to disable)
+    },
 })
 ```
 
