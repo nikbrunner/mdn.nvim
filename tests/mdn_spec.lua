@@ -3,6 +3,7 @@
 local Patterns = require("mdn.patterns")
 local List = require("mdn.list")
 local Checkbox = require("mdn.checkbox")
+local Indent = require("mdn.indent")
 
 -- ============================================================
 -- Pattern Tests
@@ -668,6 +669,133 @@ describe("list continuation", function()
       List.continue("<CR>")
       local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
       assert.are.equal("", lines[2])
+    end)
+  end)
+end)
+
+-- ============================================================
+-- Indent / Outdent Tests
+-- ============================================================
+describe("indent / outdent", function()
+  local buf
+
+  before_each(function()
+    buf = vim.api.nvim_create_buf(true, false)
+    vim.api.nvim_set_current_buf(buf)
+  end)
+
+  after_each(function()
+    if buf and vim.api.nvim_buf_is_valid(buf) then
+      pcall(vim.api.nvim_buf_delete, buf, { force = true })
+    end
+  end)
+
+  describe("indent", function()
+    it("adds shiftwidth spaces at start of line", function()
+      vim.bo.shiftwidth = 2
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "text" })
+      vim.fn.cursor(1, 1)
+      Indent.indent()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("  text", line)
+    end)
+
+    it("preserves cursor column", function()
+      vim.bo.shiftwidth = 2
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "hello" })
+      vim.fn.cursor(1, 3) -- cursor on 'l'
+      Indent.indent()
+      assert.are.equal(5, vim.fn.col(".")) -- shifted right by 2
+    end)
+
+    it("works on blank line", function()
+      vim.bo.shiftwidth = 2
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
+      vim.fn.cursor(1, 1)
+      Indent.indent()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("  ", line)
+    end)
+
+    it("works on list items", function()
+      vim.bo.shiftwidth = 2
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- item" })
+      vim.fn.cursor(1, 1)
+      Indent.indent()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("  - item", line)
+    end)
+
+    it("respects different shiftwidth values", function()
+      vim.bo.shiftwidth = 4
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "text" })
+      vim.fn.cursor(1, 1)
+      Indent.indent()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("    text", line)
+    end)
+  end)
+
+  describe("outdent", function()
+    it("removes shiftwidth leading spaces", function()
+      vim.bo.shiftwidth = 2
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "  text" })
+      vim.fn.cursor(1, 5)
+      Indent.outdent()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("text", line)
+    end)
+
+    it("removes only leading spaces, not other chars", function()
+      vim.bo.shiftwidth = 2
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "  - item" })
+      vim.fn.cursor(1, 5)
+      Indent.outdent()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("- item", line)
+    end)
+
+    it("does nothing on line with no leading spaces", function()
+      vim.bo.shiftwidth = 2
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "text" })
+      vim.fn.cursor(1, 3)
+      Indent.outdent()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("text", line)
+    end)
+
+    it("preserves cursor column", function()
+      vim.bo.shiftwidth = 2
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "  hello" })
+      vim.fn.cursor(1, 5) -- cursor on 'l'
+      Indent.outdent()
+      assert.are.equal(3, vim.fn.col(".")) -- shifted left by 2
+    end)
+
+    it("does not move cursor below col 1", function()
+      vim.bo.shiftwidth = 4
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "    text" })
+      vim.fn.cursor(1, 2) -- cursor within removed area
+      Indent.outdent()
+      assert.are.equal(1, vim.fn.col("."))
+    end)
+
+    it("removes fewer spaces if less than shiftwidth", function()
+      vim.bo.shiftwidth = 4
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "  text" })
+      vim.fn.cursor(1, 4)
+      Indent.outdent()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("text", line)
+    end)
+
+    it("works on blank line with spaces", function()
+      vim.bo.shiftwidth = 2
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "    " })
+      vim.fn.cursor(1, 3)
+      Indent.outdent()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("  ", line)
     end)
   end)
 end)

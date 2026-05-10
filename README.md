@@ -8,10 +8,11 @@
 
 ## 💡 Motivation
 
-Most Markdown plugins do too much. mdn.nvim does exactly two things:
+Most Markdown plugins do too much. mdn.nvim does exactly a few things:
 
 1. **Smart list continuation** — press Enter and the next list item appears automatically
 2. **Three-state checkbox cycle** — `<C-t>` cycles: blank → bullet → checkbox → toggle
+3. **Insert-mode indent/outdent** — `<Tab>` / `<S-Tab>` indents/outdents the current line
 
 Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 
@@ -44,12 +45,20 @@ Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 
 | Step | Starting line | `<C-t>` result |
 |------|--------------|----------------|
-| 1 | *(blank)* | `- ` |
+| 1 | *(blank)* | `- ` (or configured `bullet_marker`) |
 | 2 | `- buy milk` | `- [ ] buy milk` |
 | 3 | `- [ ] buy milk` | `- [x] buy milk` |
 | 3' | `- [x] buy milk` | `- [ ] buy milk` |
 
 Works in both Normal and Insert mode.
+
+### Insert-mode Indent/Outdent (`<Tab>` / `<S-Tab>`)
+
+- `<Tab>`: indents the current line by `shiftwidth` spaces
+- `<S-Tab>`: removes up to `shiftwidth` leading spaces
+- Works on any line: list items, plain text, blank lines
+- Cursor column is preserved relative to the indent change
+- Configurable via `indent_key` / `outdent_key` options
 
 ### Commands
 
@@ -61,8 +70,11 @@ Works in both Normal and Insert mode.
 
 ```lua
 require("mdn").setup({
-  auto_continue = true,    -- enable/disable list continuation
-  cycle_key = "<C-t>",     -- three-state cycle key (set to "" to disable)
+  auto_continue = true,      -- enable/disable list continuation
+  cycle_key = "<C-t>",       -- three-state cycle key (set to "" to disable)
+  bullet_marker = "-",       -- marker for new bullets ("-", "*", "+")
+  indent_key = "<Tab>",      -- insert-mode indent key (set to "" to disable)
+  outdent_key = "<S-Tab>",   -- insert-mode outdent key (set to "" to disable)
 })
 ```
 

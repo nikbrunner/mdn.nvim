@@ -1,30 +1,33 @@
 ---@module 'mdn.checkbox'
 
+local Config = require("mdn.config")
 local List = require("mdn.list")
 local M = {}
 
 ---Three-state cycle: blank → bullet → checkbox → toggle.
 ---
----State 1: Blank or non-list line → insert "- "
+---State 1: Blank or non-list line → insert bullet marker
 ---State 2: List item without checkbox → add "[ ] " after marker
 ---State 3: Checkbox present → toggle [ ] ↔ [x]
 ---
+---Uses Config.bullet_marker for the bullet character (default: "-").
 ---Works in both Normal and Insert mode.
 function M.cycle()
   local lnum = vim.fn.line(".")
   local line = vim.api.nvim_get_current_line()
+  local marker = Config.bullet_marker .. " "
 
   -- State 1: Blank or non-list line → create bullet point
   local lcontent = List.resolve_list_content(line)
   if not lcontent then
     if line:match("^%s*$") then
-      -- Blank line: replace with "- "
-      vim.api.nvim_set_current_line("- ")
+      -- Blank line: replace with marker
+      vim.api.nvim_set_current_line(marker)
     else
-      -- Non-blank non-list: prepend "- " to turn it into a bullet
-      vim.api.nvim_set_current_line("- " .. line)
+      -- Non-blank non-list: prepend marker to turn it into a bullet
+      vim.api.nvim_set_current_line(marker .. line)
     end
-    vim.fn.cursor(lnum, 3)
+    vim.fn.cursor(lnum, #marker + 1)
     return
   end
 

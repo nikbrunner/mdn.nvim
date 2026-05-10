@@ -50,4 +50,23 @@ vim.schedule(function()
       desc = "Mdn: Cycle bullet/checkbox",
     })
   end
+
+  -- Insert-mode indent / outdent
+  if Config.indent_key ~= "" then
+    vim.keymap.set("i", Config.indent_key, function()
+      require("mdn.indent").indent()
+    end, {
+      buffer = true,
+      desc = "Mdn: Indent current line",
+    })
+  end
+
+  if Config.outdent_key ~= "" then
+    vim.keymap.set("i", Config.outdent_key, function()
+      require("mdn.indent").outdent()
+    end, {
+      buffer = true,
+      desc = "Mdn: Outdent current line",
+    })
+  end
 end)

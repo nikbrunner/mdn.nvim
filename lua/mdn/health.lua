@@ -36,6 +36,22 @@ function M.check()
   else
     vim.health.warn("cycle_key is empty — three-state cycle is disabled")
   end
+
+  if Config.bullet_marker then
+    vim.health.ok(("bullet marker is '%s'"):format(Config.bullet_marker))
+  end
+
+  if Config.indent_key ~= "" then
+    vim.health.ok(("indent key is set to '%s'"):format(Config.indent_key))
+  else
+    vim.health.warn("indent_key is empty — indent is disabled")
+  end
+
+  if Config.outdent_key ~= "" then
+    vim.health.ok(("outdent key is set to '%s'"):format(Config.outdent_key))
+  else
+    vim.health.warn("outdent_key is empty — outdent is disabled")
+  end
 end
 
 return M
