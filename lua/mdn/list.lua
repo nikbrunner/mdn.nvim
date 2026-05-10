@@ -197,6 +197,8 @@ function M.continue(key)
       vim.api.nvim_buf_set_lines(0, lnum - 1, lnum, false, { "" })
       vim.fn.cursor(lnum, 1)
     elseif key == "O" then
+      -- Clear the empty item then insert blank above
+      vim.api.nvim_buf_set_lines(0, lnum - 1, lnum, false, { "" })
       vim.api.nvim_buf_set_lines(0, lnum - 1, lnum - 1, false, { "" })
       vim.fn.cursor(lnum, 1)
     end

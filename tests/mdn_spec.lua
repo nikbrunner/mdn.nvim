@@ -645,6 +645,19 @@ describe("list continuation", function()
       local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
       assert.are.equal("1. ", lines[1])
     end)
+
+    it("O on empty list item: clears marker and inserts blank above", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- one", "- ", "- three" })
+      vim.fn.cursor(2, 1)
+      List.continue("O")
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+      assert.are.equal("- one", lines[1])
+      assert.are.equal("", lines[2]) -- new blank line above cleared item
+      assert.are.equal("", lines[3]) -- cleared item becomes blank
+      assert.are.equal("- three", lines[4])
+      assert.are.equal(2, vim.fn.line(".")) -- cursor on the new blank line
+      assert.are.equal(1, vim.fn.col("."))
+    end)
   end)
 
   describe("continue enter (<CR>)", function()
@@ -703,6 +716,7 @@ describe("list continuation", function()
       -- Should create empty continuation, not split
       assert.are.equal("- [ ] item", lines[1])
       assert.are.equal("- [ ] ", lines[2])
+      assert.are.equal(2, vim.fn.line("."))
     end)
 
     it("splits ordered list item at cursor on Enter in middle", function()
@@ -712,6 +726,8 @@ describe("list continuation", function()
       local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
       assert.are.equal("1. hell", lines[1])
       assert.are.equal("2. o world", lines[2])
+      assert.are.equal(2, vim.fn.line("."))
+      assert.are.equal(4, vim.fn.col(".")) -- past "2. "
     end)
   end)
 end)
