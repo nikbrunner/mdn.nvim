@@ -324,6 +324,14 @@ describe("three-state cycle", function()
       local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
       assert.are.equal("- [ ] done", line)
     end)
+
+    it("completes in-progress [~] to checked", function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [~] in progress" })
+      vim.fn.cursor(1, 1)
+      Checkbox.cycle()
+      local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      assert.are.equal("- [x] in progress", line)
+    end)
   end)
 
   describe("full three-state cycle", function()
@@ -547,6 +555,15 @@ describe("toggle command", function()
     assert.is_true(result)
     local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
     assert.are.equal("- [x] todo", line)
+  end)
+
+  it("completes in-progress [~] to checked", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [~] wip" })
+    vim.fn.cursor(1, 1)
+    local result = Checkbox.toggle()
+    assert.is_true(result)
+    local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+    assert.are.equal("- [x] wip", line)
   end)
 
   it("adds checkbox to list item without one", function()

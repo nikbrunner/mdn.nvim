@@ -20,6 +20,6 @@ M.ordered_list = "^([%s]-)([%d]+)([%.%)])[%s](.*)"
 -- Task checkbox: matches "[ ]" or "[x]" or "[X]" within text
 -- Used to detect and toggle checkbox state in list items
 -- Returns: the checkbox marker
-M.task = "[%s]-(%[[ xX]%])[%s]+.-"
+M.task = "[%s]-(%[[~ xX]%])[%s]+.-"
 
 return M

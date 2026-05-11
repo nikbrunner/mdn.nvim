@@ -45,14 +45,17 @@ function M.resolve_list_content(line)
 end
 
 ---Check if the text portion of a list item has a task checkbox.
----Returns the current checkbox state: "unchecked", "checked", or nil if no checkbox.
+---Returns the current checkbox state: "unchecked", "checked", "in_progress",
+---or nil if no checkbox.
 ---@param text string The text portion of a list item
----@return string? state "unchecked"|"checked"|nil
+---@return string? state "unchecked"|"checked"|"in_progress"|nil
 function M.get_task_state(text)
   if text:match("^%[ %]") then
     return "unchecked"
   elseif text:match("^%[[xX]%]") then
     return "checked"
+  elseif text:match("^%[~%]") then
+    return "in_progress"
   end
   return nil
 end
