@@ -35,9 +35,9 @@ function M.cycle()
   local cursor_col = vim.fn.col(".")
 
   if task_state then
-    -- State 3: Toggle checkbox [ ] ↔ [x], or complete [~] → [x]
-    if task_state == "unchecked" or task_state == "in_progress" then
-      local new_line = line:gsub("%[([~ xX])%]", "[x]", 1)
+    -- State 3: Toggle [ ] ↔ [x], or complete any other state → [x]
+    if task_state == "unchecked" or task_state == "other" then
+      local new_line = line:gsub("%[(.)%]", "[x]", 1)
       vim.api.nvim_set_current_line(new_line)
     else
       local new_line = line:gsub("%[[xX]%]", "[ ]", 1)
@@ -81,8 +81,8 @@ function M.toggle()
   -- Toggle existing checkbox
   local lnum = vim.fn.line(".")
   local cursor_col = vim.fn.col(".")
-  if task_state == "unchecked" or task_state == "in_progress" then
-    vim.api.nvim_set_current_line((line:gsub("%[([~ xX])%]", "[x]", 1)))
+  if task_state == "unchecked" or task_state == "other" then
+    vim.api.nvim_set_current_line((line:gsub("%[(.)%]", "[x]", 1)))
   else
     vim.api.nvim_set_current_line((line:gsub("%[[xX]%]", "[ ]", 1)))
   end

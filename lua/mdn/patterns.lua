@@ -17,9 +17,10 @@ M.unordered_list = "^([%s]-)([-+*])[%s](.*)"
 -- Returns: indent (spaces), number, separator (./)), text
 M.ordered_list = "^([%s]-)([%d]+)([%.%)])[%s](.*)"
 
--- Task checkbox: matches "[ ]" or "[x]" or "[X]" within text
+-- Task checkbox: matches any single-char checkbox within text
+-- e.g. "[ ]", "[x]", "[~]", "[>]", "[o]", "[<]"
 -- Used to detect and toggle checkbox state in list items
 -- Returns: the checkbox marker
-M.task = "[%s]-(%[[~ xX]%])[%s]+.-"
+M.task = "[%s]-(%[.%])[%s]+.-"
 
 return M

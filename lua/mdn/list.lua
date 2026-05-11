@@ -45,19 +45,23 @@ function M.resolve_list_content(line)
 end
 
 ---Check if the text portion of a list item has a task checkbox.
----Returns the current checkbox state: "unchecked", "checked", "in_progress",
----or nil if no checkbox.
+---Recognizes any single character inside brackets at the start of text
+---as a task state: "[ ]" is unchecked, "[x]"/"[X]" is checked, all
+---other variants ("[~]", "[>]", "[o]", "[<]", etc.) are "other".
+---Returns nil if no checkbox is present.
 ---@param text string The text portion of a list item
----@return string? state "unchecked"|"checked"|"in_progress"|nil
+---@return string? state "unchecked"|"checked"|"other"|nil
 function M.get_task_state(text)
-  if text:match("^%[ %]") then
-    return "unchecked"
-  elseif text:match("^%[[xX]%]") then
-    return "checked"
-  elseif text:match("^%[~%]") then
-    return "in_progress"
+  local char = text:match("^%[(.)%]")
+  if not char then
+    return nil
   end
-  return nil
+  if char == " " then
+    return "unchecked"
+  elseif char == "x" or char == "X" then
+    return "checked"
+  end
+  return "other"
 end
 
 ---Generate the continuation prefix for the next list item.
