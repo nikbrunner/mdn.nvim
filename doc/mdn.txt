@@ -17,7 +17,7 @@ TABLE OF CONTENTS                                          *mdn-contents*
 1. INTRODUCTION                                              *mdn-intro*
 
 mdn.nvim is a minimal Neovim plugin for Markdown editing that provides
-smart list continuation, a three-state checkbox cycle, and insert-mode
+smart list continuation, a four-state checkbox cycle, and insert-mode
 line indent/outdent.
 
 It's deliberately small — no wikilinks, no tables, no ToC. Just the
@@ -33,10 +33,11 @@ things you miss most when editing Markdown in Neovim.
   - Empty list items terminate continuation
   - Works with indented/nested lists
 
-- Three-state checkbox cycle on <C-t>
+- Four-state checkbox cycle on <C-t>
   - 1. Blank/non-list line → creates bullet (uses configured bullet_marker)
   - 2. Bullet exists → adds "[ ] " after marker
-  - 3. Checkbox present → toggles [ ] ↔ [x]
+  - 3. [ ] → [~] (unchecked → in progress)
+  - 4. [~] → [x] (in progress → done); [x] → [ ] (done → unchecked, cycle restarts); other checkbox chars → [x]
   - Same key works in both Normal and Insert mode
 
 - Insert-mode line indent/outdent on <Tab>/<S-Tab>
@@ -118,9 +119,10 @@ OPTIONS ~
 
 CYCLING EXAMPLE ~
 >
-  (blank line)  <C-t>  →  "- " (or configured bullet_marker)
-  "- buy milk"  <C-t>  →  "- [ ] buy milk"
-  "- [ ] buy milk"  <C-t>  →  "- [x] buy milk"
+  (blank line)    <C-t>  →  "- " (or configured bullet_marker)
+  "- buy milk"     <C-t>  →  "- [ ] buy milk"
+  "- [ ] buy milk"  <C-t>  →  "- [~] buy milk"
+  "- [~] buy milk"  <C-t>  →  "- [x] buy milk"
   "- [x] buy milk"  <C-t>  →  "- [ ] buy milk"
 <
 
@@ -155,7 +157,7 @@ LIST CONTINUATION (when auto_continue = true) ~
 
 CHECKBOX CYCLE ~
 >
-  <C-t>  (Normal + Insert)  Three-state cycle: blank → bullet → checkbox → toggle
+  <C-t>  (Normal + Insert)  Four-state cycle: blank → bullet → [ ] → [~] → [x] → [ ]
 <
 
 INDENT / OUTDENT ~

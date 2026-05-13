@@ -47,8 +47,9 @@ Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 |------|--------------|----------------|
 | 1 | *(blank)* | `- ` (or configured `bullet_marker`) |
 | 2 | `- buy milk` | `- [ ] buy milk` |
-| 3 | `- [ ] buy milk` | `- [x] buy milk` |
-| 3' | `- [x] buy milk` | `- [ ] buy milk` |
+| 3 | `- [ ] buy milk` | `- [~] buy milk` |
+| 4 | `- [~] buy milk` | `- [x] buy milk` |
+| 4' | `- [x] buy milk` | `- [ ] buy milk` |
 
 Works in both Normal and Insert mode.
 

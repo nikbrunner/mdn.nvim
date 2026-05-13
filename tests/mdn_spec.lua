@@ -300,13 +300,13 @@ describe("three-state cycle", function()
     end)
   end)
 
-  describe("state 3: checkbox toggle", function()
-    it("toggles unchecked to checked", function()
+  describe("state 3: checkbox cycling", function()
+    it("cycles [ ] to [~] (unchecked → in-progress)", function()
       vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [ ] todo" })
       vim.fn.cursor(1, 1)
       Checkbox.cycle()
       local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
-      assert.are.equal("- [x] todo", line)
+      assert.are.equal("- [~] todo", line)
     end)
 
     it("toggles checked to unchecked", function()
@@ -358,8 +358,8 @@ describe("three-state cycle", function()
     end)
   end)
 
-  describe("full three-state cycle", function()
-    it("cycles blank → bullet → checkbox → checked", function()
+  describe("full four-state cycle", function()
+    it("cycles blank → bullet → [ ] → [~] → [x] → [ ]", function()
       -- State 1: blank → bullet
       vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
       vim.fn.cursor(1, 1)
@@ -369,15 +369,19 @@ describe("three-state cycle", function()
       -- Add text to the bullet
       vim.api.nvim_buf_set_lines(buf, 0, 1, false, { "- buy milk" })
 
-      -- State 2: bullet → checkbox
+      -- State 2: bullet → [ ]
       Checkbox.cycle()
       assert.are.equal("- [ ] buy milk", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
 
-      -- State 3: checkbox toggle (unchecked → checked)
+      -- State 3: [ ] → [~]
+      Checkbox.cycle()
+      assert.are.equal("- [~] buy milk", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+
+      -- State 4: [~] → [x]
       Checkbox.cycle()
       assert.are.equal("- [x] buy milk", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
 
-      -- State 3 (again): toggle back
+      -- State 4 (again): [x] → [ ]
       Checkbox.cycle()
       assert.are.equal("- [ ] buy milk", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
     end)
@@ -424,11 +428,11 @@ describe("cursor position", function()
       assert.are.equal(8, vim.fn.col(".")) -- still on 'b', shifted by 4
     end)
 
-    it("checkbox toggle: cursor stays put", function()
+    it("checkbox cycle: cursor stays put", function()
       vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [ ] todo" })
       vim.fn.cursor(1, 7) -- cursor on 't'
       Checkbox.cycle()
-      assert.are.equal("- [x] todo", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+      assert.are.equal("- [~] todo", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
       assert.are.equal(7, vim.fn.col(".")) -- same column
     end)
 
