@@ -5,3 +5,4 @@ doc/tags
 .nvim-init.md
 .tests/
 /plans
+/tmp
