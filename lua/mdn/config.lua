@@ -18,7 +18,7 @@ local defaults = {
     bullet_marker = "-",
   },
   mappings = {
-    cycle_key = "<C-t>",
+    cycle_key = "<C-CR>",
     indent_key = "<Tab>",
     outdent_key = "<S-Tab>",
   },
