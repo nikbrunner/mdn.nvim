@@ -19,8 +19,8 @@ local defaults = {
   },
   mappings = {
     cycle_key = "<C-CR>",
-    indent_key = "<Tab>",
-    outdent_key = "<S-Tab>",
+    indent_key = "<C-i>",
+    outdent_key = "<C-o>",
   },
 }
 
