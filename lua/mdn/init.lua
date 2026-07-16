@@ -44,16 +44,4 @@ function M.continue_list_enter()
   require("mdn.list").continue("<CR>")
 end
 
----Indent the current line by shiftwidth spaces.
----Works in Insert mode, on any line type.
-function M.indent()
-  require("mdn.indent").indent()
-end
-
----Outdent the current line by removing up to shiftwidth leading spaces.
----Works in Insert mode, on any line type.
-function M.outdent()
-  require("mdn.indent").outdent()
-end
-
 return M

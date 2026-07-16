@@ -17,8 +17,7 @@ TABLE OF CONTENTS                                          *mdn-contents*
 1. INTRODUCTION                                              *mdn-intro*
 
 mdn.nvim is a minimal Neovim plugin for Markdown editing that provides
-smart list continuation, a four-state checkbox cycle, and insert-mode
-line indent/outdent.
+smart list continuation and a four-state checkbox cycle.
 
 It's deliberately small — no wikilinks, no tables, no ToC. Just the
 things you miss most when editing Markdown in Neovim.
@@ -33,19 +32,15 @@ things you miss most when editing Markdown in Neovim.
   - Empty list items terminate continuation
   - Works with indented/nested lists
 
-- Four-state checkbox cycle on <C-t>
+- Four-state checkbox cycle on <C-CR>
   - 1. Blank/non-list line → creates bullet (uses configured bullet_marker)
   - 2. Bullet exists → adds "[ ] " after marker
   - 3. [ ] → [~] (unchecked → in progress)
   - 4. [~] → [x] (in progress → done); [x] → [ ] (done → unchecked, cycle restarts); other checkbox chars → [x]
   - Same key works in both Normal and Insert mode
 
-- Insert-mode line indent/outdent on <Tab>/<S-Tab>
-  - <Tab> indents current line by 'shiftwidth' spaces
-  - <S-Tab> removes up to 'shiftwidth' leading spaces
-  - Works on any line: list items, plain text, blank lines
-  - Cursor column is preserved relative to the indent change
-  - Configurable keybindings (indent_key / outdent_key)
+For insert-mode line indent/outdent, use Neovim's built-in |i_CTRL-T| and
+|i_CTRL-D|.
 
 ==============================================================================
 3. REQUIREMENTS                                        *mdn-requirements*
@@ -86,9 +81,7 @@ DEFAULT CONFIGURATION ~
       bullet_marker = "-",
     },
     mappings = {
-      cycle_key = "<C-t>",
-      indent_key = "<Tab>",
-      outdent_key = "<S-Tab>",
+      cycle_key = "<C-CR>",
     },
   })
 <
@@ -104,34 +97,18 @@ OPTIONS ~
     bullet from a blank or non-list line. Accepted values: "-",
     "*", "+".
 
-  mappings.cycle_key     (string, default: "<C-t>")
+  mappings.cycle_key     (string, default: "<C-CR>")
     Key for the three-state bullet/checkbox cycle in both Normal
     and Insert mode. Set to "" to disable.
-
-  mappings.indent_key    (string, default: "<Tab>")
-    Insert-mode key to indent the current line by 'shiftwidth'
-    spaces. Set to "" to disable.
-
-  mappings.outdent_key   (string, default: "<S-Tab>")
-    Insert-mode key to outdent the current line by removing up
-    to 'shiftwidth' leading spaces. Set to "" to disable.
 <
 
 CYCLING EXAMPLE ~
 >
-  (blank line)    <C-t>  →  "- " (or configured bullet_marker)
-  "- buy milk"     <C-t>  →  "- [ ] buy milk"
-  "- [ ] buy milk"  <C-t>  →  "- [~] buy milk"
-  "- [~] buy milk"  <C-t>  →  "- [x] buy milk"
-  "- [x] buy milk"  <C-t>  →  "- [ ] buy milk"
-<
-
-INDENT/OUTDENT EXAMPLE ~
->
-  "text"       <Tab>    →  "  text"    (shiftwidth=2)
-  "  text"     <S-Tab>  →  "text"
-  "- item"     <Tab>    →  "  - item" (list items too)
-  "    "       <S-Tab>  →  "  "       (blank lines too)
+  (blank line)    <C-CR>  →  "- " (or configured bullet_marker)
+  "- buy milk"     <C-CR>  →  "- [ ] buy milk"
+  "- [ ] buy milk"  <C-CR>  →  "- [~] buy milk"
+  "- [~] buy milk"  <C-CR>  →  "- [x] buy milk"
+  "- [x] buy milk"  <C-CR>  →  "- [ ] buy milk"
 <
 
 ==============================================================================
@@ -157,13 +134,8 @@ LIST CONTINUATION (when auto_continue = true) ~
 
 CHECKBOX CYCLE ~
 >
-  <C-t>  (Normal + Insert)  Four-state cycle: blank → bullet → [ ] → [~] → [x] → [ ]
+  <C-CR>  (Normal + Insert)  Four-state cycle: blank → bullet → [ ] → [~] → [x] → [ ]
 <
-
-INDENT / OUTDENT ~
->
-  <Tab>    (Insert)  Indent current line by 'shiftwidth' spaces
-  <S-Tab>  (Insert)  Outdent current line (remove leading spaces)
 
 ==============================================================================
 8. API                                                          *mdn-api*
@@ -195,16 +167,6 @@ mdn.continue_list_above() ~
                                                       *mdn.continue_list_enter()*
 mdn.continue_list_enter() ~
     Continue list on Enter (for Insert mode <CR> remap).
-
-                                                                   *mdn.indent()*
-mdn.indent() ~
-    Indent the current line by 'shiftwidth' spaces. Works on any
-    line type, in Insert mode.
-
-                                                                  *mdn.outdent()*
-mdn.outdent() ~
-    Outdent the current line by removing up to 'shiftwidth'
-    leading spaces. Works on any line type, in Insert mode.
 
 ==============================================================================
 9. DEVELOPMENT                                          *mdn-development*

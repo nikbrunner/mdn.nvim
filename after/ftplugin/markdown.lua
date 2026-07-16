@@ -45,22 +45,3 @@ if Config.mappings.cycle_key ~= "" then
     desc = "Mdn: Cycle bullet/checkbox",
   })
 end
-
--- Insert-mode indent / outdent
-if Config.mappings.indent_key ~= "" then
-  vim.keymap.set("i", Config.mappings.indent_key, function()
-    require("mdn.indent").indent()
-  end, {
-    buffer = buf,
-    desc = "Mdn: Indent current line",
-  })
-end
-
-if Config.mappings.outdent_key ~= "" then
-  vim.keymap.set("i", Config.mappings.outdent_key, function()
-    require("mdn.indent").outdent()
-  end, {
-    buffer = buf,
-    desc = "Mdn: Outdent current line",
-  })
-end

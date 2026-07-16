@@ -9,8 +9,6 @@ local M = {}
 
 ---@class Mdn.MappingsOptions
 ---@field cycle_key string Key for three-state cycle: blank → bullet → checkbox → toggle (set to "" to disable)
----@field indent_key string Insert-mode key for indenting current line (set to "" to disable)
----@field outdent_key string Insert-mode key for outdenting current line (set to "" to disable)
 
 local defaults = {
   lists = {
@@ -19,12 +17,10 @@ local defaults = {
   },
   mappings = {
     cycle_key = "<C-CR>",
-    indent_key = "<C-i>",
-    outdent_key = "<C-o>",
   },
 }
 
--- Access nested config values: Config.lists.bullet_marker, Config.mappings.indent_key, etc.
+-- Access nested config values: Config.lists.bullet_marker, Config.mappings.cycle_key, etc.
 local config = vim.deepcopy(defaults)
 
 -- Created at module load — always available
@@ -49,12 +45,6 @@ function M.setup(opts)
   end
   if config.lists.bullet_marker then
     vim.validate("bullet_marker", config.lists.bullet_marker, "string")
-  end
-  if config.mappings.indent_key then
-    vim.validate("indent_key", config.mappings.indent_key, "string")
-  end
-  if config.mappings.outdent_key then
-    vim.validate("outdent_key", config.mappings.outdent_key, "string")
   end
 end
 

@@ -40,18 +40,6 @@ function M.check()
   if Config.lists.bullet_marker then
     vim.health.ok(("bullet marker is '%s'"):format(Config.lists.bullet_marker))
   end
-
-  if Config.mappings.indent_key ~= "" then
-    vim.health.ok(("indent key is set to '%s'"):format(Config.mappings.indent_key))
-  else
-    vim.health.warn("indent_key is empty — indent is disabled")
-  end
-
-  if Config.mappings.outdent_key ~= "" then
-    vim.health.ok(("outdent key is set to '%s'"):format(Config.mappings.outdent_key))
-  else
-    vim.health.warn("outdent_key is empty — outdent is disabled")
-  end
 end
 
 return M

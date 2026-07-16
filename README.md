@@ -11,8 +11,7 @@
 Most Markdown plugins do too much. mdn.nvim does exactly a few things:
 
 1. **Smart list continuation** — press Enter and the next list item appears automatically
-2. **Three-state checkbox cycle** — `<C-t>` cycles: blank → bullet → checkbox → toggle
-3. **Insert-mode indent/outdent** — `<Tab>` / `<S-Tab>` indents/outdents the current line
+2. **Three-state checkbox cycle** — `<C-CR>` cycles: blank → bullet → checkbox → toggle
 
 Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 
@@ -41,9 +40,9 @@ Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 - Task lists (`- [ ]`): continues with empty checkbox
 - Empty items (`- `): terminates (inserts blank line)
 
-### Checkbox Cycle (`<C-t>`)
+### Checkbox Cycle (`<C-CR>`)
 
-| Step | Starting line | `<C-t>` result |
+| Step | Starting line | `<C-CR>` result |
 |------|--------------|----------------|
 | 1 | *(blank)* | `- ` (or configured `bullet_marker`) |
 | 2 | `- buy milk` | `- [ ] buy milk` |
@@ -53,13 +52,9 @@ Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 
 Works in both Normal and Insert mode.
 
-### Insert-mode Indent/Outdent (`<Tab>` / `<S-Tab>`)
-
-- `<Tab>`: indents the current line by `shiftwidth` spaces
-- `<S-Tab>`: removes up to `shiftwidth` leading spaces
-- Works on any line: list items, plain text, blank lines
-- Cursor column is preserved relative to the indent change
-- Configurable via `indent_key` / `outdent_key` options
+> [!TIP]
+> For indenting/outdenting list items in Insert mode, use Neovim's built-in
+> `<C-t>` / `<C-d>` (see `:h i_CTRL-T`).
 
 ### Commands
 
@@ -76,9 +71,7 @@ require("mdn").setup({
         bullet_marker = "-",       -- marker for new bullets ("-", "*", "+")
     },
     mappings = {
-      cycle_key = "<C-t>",       -- three-state cycle key (set to "" to disable)
-      indent_key = "<Tab>",      -- insert-mode indent key (set to "" to disable)
-      outdent_key = "<S-Tab>",   -- insert-mode outdent key (set to "" to disable)
+      cycle_key = "<C-CR>",      -- three-state cycle key (set to "" to disable)
     },
 })
 ```
