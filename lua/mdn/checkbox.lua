@@ -71,6 +71,34 @@ function M.cycle()
   end
 end
 
+---Set a line's checkbox to the given target state.
+---Only touches lines that already have a checkbox.
+---@param line string
+---@param target "checked"|"unchecked"
+---@return string new_line
+---@return boolean changed
+local function set_checkbox(line, target)
+  local lcontent = List.resolve_list_content(line)
+  if not lcontent then
+    return line, false
+  end
+  local task_state = List.get_task_state(lcontent.text)
+  if not task_state then
+    return line, false
+  end
+  if target == "checked" then
+    if task_state == "checked" then
+      return line, false
+    end
+    return (line:gsub("%[(.)%]", "[x]", 1)), true
+  else
+    if task_state == "unchecked" then
+      return line, false
+    end
+    return (line:gsub("%[(.)%]", "[ ]", 1)), true
+  end
+end
+
 ---Toggle only the checkbox state (no bullet creation).
 ---Used by the :Mdn toggle command.
 ---Returns true if toggled, false if no checkbox was found.
@@ -105,6 +133,48 @@ function M.toggle()
   end
   vim.fn.cursor(lnum, cursor_col)
   return true
+end
+
+---Toggle checkboxes across a range of lines.
+---Uses uniform decision: if any checkbox in the range is not checked,
+---all get checked. Otherwise all get unchecked.
+---Lines without an existing checkbox are left untouched.
+---@param line1 integer 1-indexed start line
+---@param line2 integer 1-indexed end line
+function M.toggle_range(line1, line2)
+  local buf = vim.api.nvim_get_current_buf()
+  local lines = vim.api.nvim_buf_get_lines(buf, line1 - 1, line2, false)
+
+  -- Determine uniform target: if any checkbox is not checked, check all
+  local all_checked = true
+  local has_any_checkbox = false
+  for _, line in ipairs(lines) do
+    local lcontent = List.resolve_list_content(line)
+    if lcontent then
+      local task_state = List.get_task_state(lcontent.text)
+      if task_state then
+        has_any_checkbox = true
+        if task_state ~= "checked" then
+          all_checked = false
+          break
+        end
+      end
+    end
+  end
+
+  if not has_any_checkbox then
+    return
+  end
+
+  local target = all_checked and "unchecked" or "checked"
+
+  local new_lines = {}
+  for _, line in ipairs(lines) do
+    local new_line = set_checkbox(line, target)
+    table.insert(new_lines, new_line)
+  end
+
+  vim.api.nvim_buf_set_lines(buf, line1 - 1, line2, false, new_lines)
 end
 
 return M

@@ -639,6 +639,109 @@ describe("toggle command", function()
 end)
 
 -- ============================================================
+-- Range Toggle Tests (toggle_range)
+-- ============================================================
+describe("range toggle", function()
+  local buf
+
+  before_each(function()
+    buf = vim.api.nvim_create_buf(true, false)
+    vim.api.nvim_set_current_buf(buf)
+  end)
+
+  after_each(function()
+    if buf and vim.api.nvim_buf_is_valid(buf) then
+      pcall(vim.api.nvim_buf_delete, buf, { force = true })
+    end
+  end)
+
+  it("checks all when some are unchecked", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+      "- [ ] first",
+      "- [x] second",
+      "- [ ] third",
+    })
+    Checkbox.toggle_range(1, 3)
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    assert.are.equal("- [x] first", lines[1])
+    assert.are.equal("- [x] second", lines[2])
+    assert.are.equal("- [x] third", lines[3])
+  end)
+
+  it("unchecks all when all are checked", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+      "- [x] first",
+      "- [x] second",
+    })
+    Checkbox.toggle_range(1, 2)
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    assert.are.equal("- [ ] first", lines[1])
+    assert.are.equal("- [ ] second", lines[2])
+  end)
+
+  it("treats in-progress [~] as not checked", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+      "- [x] done",
+      "- [~] wip",
+    })
+    Checkbox.toggle_range(1, 2)
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    assert.are.equal("- [x] done", lines[1])
+    assert.are.equal("- [x] wip", lines[2])
+  end)
+
+  it("skips lines without checkboxes", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+      "- [ ] task",
+      "- plain bullet",
+      "# heading",
+      "",
+      "- [x] done",
+    })
+    Checkbox.toggle_range(1, 5)
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    assert.are.equal("- [x] task", lines[1])
+    assert.are.equal("- plain bullet", lines[2])
+    assert.are.equal("# heading", lines[3])
+    assert.are.equal("", lines[4])
+    assert.are.equal("- [x] done", lines[5])
+  end)
+
+  it("does nothing when no checkboxes in range", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+      "- plain",
+      "some text",
+    })
+    Checkbox.toggle_range(1, 2)
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    assert.are.equal("- plain", lines[1])
+    assert.are.equal("some text", lines[2])
+  end)
+
+  it("single-line range matches single-line toggle", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [ ] todo" })
+    Checkbox.toggle_range(1, 1)
+    local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+    assert.are.equal("- [x] todo", line)
+  end)
+
+  it("handles partial range within buffer", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+      "- [x] before",
+      "- [ ] first",
+      "- [ ] second",
+      "- [x] after",
+    })
+    Checkbox.toggle_range(2, 3)
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    assert.are.equal("- [x] before", lines[1])
+    assert.are.equal("- [x] first", lines[2])
+    assert.are.equal("- [x] second", lines[3])
+    assert.are.equal("- [x] after", lines[4])
+  end)
+end)
+
+-- ============================================================
 -- List Continuation Tests (buffer-based)
 -- ============================================================
 describe("list continuation", function()

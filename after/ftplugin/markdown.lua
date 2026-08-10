@@ -44,4 +44,17 @@ if Config.mappings.cycle_key ~= "" then
     buffer = buf,
     desc = "Mdn: Cycle bullet/checkbox",
   })
+
+  vim.keymap.set("v", Config.mappings.cycle_key, function()
+    local line1 = vim.fn.line("v")
+    local line2 = vim.fn.line(".")
+    if line1 > line2 then
+      line1, line2 = line2, line1
+    end
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+    require("mdn.checkbox").toggle_range(line1, line2)
+  end, {
+    buffer = buf,
+    desc = "Mdn: Toggle checkboxes in selection",
+  })
 end

@@ -119,6 +119,11 @@ CYCLING EXAMPLE ~
     item without a checkbox). Unlike the keymap cycle, this does NOT
     create bullet points from blank lines.
 
+    Accepts a range: select lines in Visual mode and run
+    `:'<,'>Mdn toggle`. When given a range, uses a uniform decision —
+    if any checkbox is unchecked, all get checked; if all are checked,
+    all get unchecked. Lines without an existing checkbox are skipped.
+
 ==============================================================================
 7. KEYMAPS                                                  *mdn-keymaps*
 
@@ -135,6 +140,7 @@ LIST CONTINUATION (when auto_continue = true) ~
 CHECKBOX CYCLE ~
 >
   <C-CR>  (Normal + Insert)  Four-state cycle: blank → bullet → [ ] → [~] → [x] → [ ]
+  <C-CR>  (Visual)           Toggle checkboxes across selected lines
 <
 
 ==============================================================================

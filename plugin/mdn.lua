@@ -3,8 +3,12 @@
 -- when the user actually invokes a command (lazy-loading).
 
 local sub_cmds = {
-  toggle = function()
-    require("mdn").toggle_checkbox()
+  toggle = function(opts)
+    if opts.range > 0 then
+      require("mdn.checkbox").toggle_range(opts.line1, opts.line2)
+    else
+      require("mdn").toggle_checkbox()
+    end
   end,
 }
 
@@ -18,12 +22,13 @@ local function main_cmd(opts)
   if sub_cmd == nil then
     vim.notify("Mdn: unknown subcommand: " .. tostring(opts.args), vim.log.levels.ERROR, { title = "mdn.nvim" })
   else
-    sub_cmd()
+    sub_cmd(opts)
   end
 end
 
 vim.api.nvim_create_user_command("Mdn", main_cmd, {
   nargs = "?",
+  range = true,
   desc = "Mdn: Markdown utility commands",
   complete = function(arg_lead, _, _)
     return vim

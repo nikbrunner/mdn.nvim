@@ -42,13 +42,13 @@ Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 
 ### Checkbox Cycle (`<C-CR>`)
 
-| Step | Starting line | `<C-CR>` result |
-|------|--------------|----------------|
-| 1 | *(blank)* | `- ` (or configured `bullet_marker`) |
-| 2 | `- buy milk` | `- [ ] buy milk` |
-| 3 | `- [ ] buy milk` | `- [~] buy milk` |
-| 4 | `- [~] buy milk` | `- [x] buy milk` |
-| 4' | `- [x] buy milk` | `- [ ] buy milk` |
+| Step | Starting line    | `<C-CR>` result                      |
+| ---- | ---------------- | ------------------------------------ |
+| 1    | _(blank)_        | `- ` (or configured `bullet_marker`) |
+| 2    | `- buy milk`     | `- [ ] buy milk`                     |
+| 3    | `- [ ] buy milk` | `- [~] buy milk`                     |
+| 4    | `- [~] buy milk` | `- [x] buy milk`                     |
+| 4'   | `- [x] buy milk` | `- [ ] buy milk`                     |
 
 Works in both Normal and Insert mode.
 
@@ -58,9 +58,9 @@ Works in both Normal and Insert mode.
 
 ### Commands
 
-| Command | Action |
-|---------|--------|
-| `:Mdn toggle` | Toggle checkbox (no bullet creation) |
+| Command       | Action                                                        |
+| ------------- | ------------------------------------------------------------- |
+| `:Mdn toggle` | Toggle checkbox (no bullet creation). Accepts a visual range. |
 
 ## ⚙️ Configuration
 
@@ -78,7 +78,7 @@ require("mdn").setup({
 
 ## 📖 Documentation
 
-Full docs: `:help mdn.txt`  |  Health: `:checkhealth mdn`
+Full docs: `:help mdn.txt` | Health: `:checkhealth mdn`
 
 ## 🙏 Acknowledgments
 
