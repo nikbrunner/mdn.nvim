@@ -15,9 +15,10 @@ function M.setup(opts)
   end
   M.did_setup = true
   require("mdn.config").setup(opts)
+  require("mdn.conceal").setup()
 end
 
----Three-state cycle: blank → bullet → checkbox → toggle.
+---Four-state cycle: blank → bullet → checkbox → toggle.
 ---Works in both Normal and Insert mode.
 function M.cycle()
   require("mdn.checkbox").cycle()

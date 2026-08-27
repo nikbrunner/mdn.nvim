@@ -36,8 +36,18 @@ things you miss most when editing Markdown in Neovim.
   - 1. Blank/non-list line → creates bullet (uses configured bullet_marker)
   - 2. Bullet exists → adds "[ ] " after marker
   - 3. [ ] → [~] (unchecked → in progress)
-  - 4. [~] → [x] (in progress → done); [x] → [ ] (done → unchecked, cycle restarts); other checkbox chars → [x]
+  - 4. [~] → [x] (in progress → done); [x] → [ ] (done →
+    unchecked, cycle restarts); other checkbox chars → [x]
   - Same key works in both Normal and Insert mode
+
+- Concealed list and checkbox markers
+  - Unordered list markers display as the configured listitem symbol
+  - [ ], [x]/[X], [~], [>], [<], [o], and [-] display as their configured symbols
+  - Checkbox lines replace the complete `- [state]` prefix with one symbol
+  - Symbols include two spaces before the item text
+  - The Markdown source remains unchanged
+  - Virtual symbols remain visible with 'conceallevel' set to 3
+  - Virtual symbols are hidden on the cursor line for editing
 
 For insert-mode line indent/outdent, use Neovim's built-in |i_CTRL-T| and
 |i_CTRL-D|.
@@ -83,6 +93,16 @@ DEFAULT CONFIGURATION ~
     mappings = {
       cycle_key = "<C-CR>",
     },
+    conceal = {
+      listitem = { pattern = "[-+*]%s", replace = " " },
+      unchecked = { pattern = "%[%s%]%s", replace = "󰄱 " },
+      checked = { pattern = "%[[xX]%]%s", replace = "󰄲 " },
+      partial = { pattern = "%[~%]%s", replace = "󰡖 " },
+      defer = { pattern = "%[>%]%s", replace = "󰁔 " },
+      scheduled = { pattern = "%[<%]%s", replace = "󰃰 " },
+      event = { pattern = "%[o%]%s", replace = "󰃭 " },
+      canceled = { pattern = "%[%-]%s", replace = "󱋭 " },
+    },
   })
 <
 
@@ -98,8 +118,30 @@ OPTIONS ~
     "*", "+".
 
   mappings.cycle_key     (string, default: "<C-CR>")
-    Key for the three-state bullet/checkbox cycle in both Normal
+    Key for the four-state bullet/checkbox cycle in both Normal
     and Insert mode. Set to "" to disable.
+
+  conceal.<state>        (table)
+    Rule for a list marker or checkbox state. Each rule contains:
+
+    pattern (string)
+      Lua pattern matched at the relevant source token.
+
+    replace (string)
+      Text displayed in place of the match, including any spacing.
+
+    Defaults:
+      listitem  pattern "[-+*]%s", replace " "
+      unchecked pattern "%[%s%]%s", replace "󰄱 "
+      checked   pattern "%[[xX]%]%s", replace "󰄲 "
+      partial   pattern "%[~%]%s", replace "󰡖 "
+      defer     pattern "%[>%]%s", replace "󰁔 "
+      scheduled pattern "%[<%]%s", replace "󰃰 "
+      event     pattern "%[o%]%s", replace "󰃭 "
+      canceled  pattern "%[%-]%s", replace "󱋭 "
+
+    The defaults use current nf-md Nerd Font glyphs. A Nerd Font is
+    required to display them; each rule can be replaced.
 <
 
 CYCLING EXAMPLE ~
@@ -139,7 +181,8 @@ LIST CONTINUATION (when auto_continue = true) ~
 
 CHECKBOX CYCLE ~
 >
-  <C-CR>  (Normal + Insert)  Four-state cycle: blank → bullet → [ ] → [~] → [x] → [ ]
+  <C-CR>  (Normal + Insert)  Four-state cycle: blank → bullet → [ ] →
+    [~] → [x] → [ ]
   <C-CR>  (Visual)           Toggle checkboxes across selected lines
 <
 
@@ -154,7 +197,7 @@ mdn.setup({opts}) ~
 
                                                                    *mdn.cycle()*
 mdn.cycle() ~
-    Run the three-state cycle on the current line. Works in both
+    Run the four-state cycle on the current line. Works in both
     Normal and Insert mode.
 
                                                           *mdn.toggle_checkbox()*

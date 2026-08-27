@@ -35,7 +35,7 @@ if Config.lists.auto_continue then
   })
 end
 
--- Three-state cycle: blank → bullet → checkbox → toggle
+-- Four-state cycle: blank → bullet → checkbox → toggle
 -- Same key in both Normal and Insert mode
 if Config.mappings.cycle_key ~= "" then
   vim.keymap.set({ "n", "i" }, Config.mappings.cycle_key, function()
