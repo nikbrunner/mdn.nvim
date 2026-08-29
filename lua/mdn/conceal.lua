@@ -18,7 +18,7 @@ local checkbox_symbols = {
 local function add_mark(buf, row, start_col, end_col, symbol)
   local opts = {
     end_col = end_col,
-    conceal = true,
+    conceal = "",
     priority = 200,
   }
   if symbol ~= "" then
@@ -41,6 +41,10 @@ function M.render(buf)
   vim.validate("buf", buf, "number")
 
   vim.api.nvim_buf_clear_namespace(buf, Config.conceal_ns, 0, -1)
+  if vim.wo.conceallevel == 0 then
+    return
+  end
+
   local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
   local cursor_row
   if vim.api.nvim_get_current_buf() == buf then
@@ -84,6 +88,12 @@ local function refresh(args)
   end
 end
 
+local function refresh_conceallevel()
+  if vim.bo.filetype == "markdown" then
+    M.render(0)
+  end
+end
+
 ---Enable automatic conceal rendering for Markdown buffers.
 function M.setup()
   vim.api.nvim_create_autocmd(
@@ -94,6 +104,11 @@ function M.setup()
       callback = refresh,
     }
   )
+  vim.api.nvim_create_autocmd("OptionSet", {
+    group = Config.augroup,
+    pattern = "conceallevel",
+    callback = refresh_conceallevel,
+  })
 
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].filetype == "markdown" then

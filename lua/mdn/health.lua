@@ -6,17 +6,13 @@ local M = {}
 function M.check()
   vim.health.start("mdn.nvim")
 
-  local ok, mdn = pcall(require, "mdn")
+  local ok, err = pcall(require, "mdn")
   if not ok then
-    vim.health.error("Failed to load mdn.nvim: " .. tostring(mdn))
+    vim.health.error("Failed to load mdn.nvim: " .. tostring(err))
     return
   end
 
-  if mdn.did_setup then
-    vim.health.ok("setup() was called")
-  else
-    vim.health.error("setup() was not called — add require('mdn').setup() to your config")
-  end
+  vim.health.ok("plugin is loaded")
 
   if vim.fn.has("nvim-0.10") == 1 then
     vim.health.ok("Neovim >= 0.10")

@@ -11,7 +11,7 @@
 Most Markdown plugins do too much. mdn.nvim does exactly a few things:
 
 1. **Smart list continuation** — press Enter and the next list item appears automatically
-2. **Bullet/checkbox cycle** — `<C-CR>` cycles: blank → bullet → [ ] → [~] → [x] → bullet
+2. **Bullet/checkbox cycle** — `<S-CR>` cycles: blank → bullet → [ ] → [~] → [x] → bullet
 3. **Concealed list markers** — shows padded symbols for list items and checkbox states; keeps the current line editable
 
 Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
@@ -22,13 +22,18 @@ Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 
 ## 📦 Installation
 
+### vim.pack (Neovim 0.12+)
+
+```lua
+vim.pack.add({ "https://github.com/nikbrunner/mdn.nvim" }, { load = true })
+```
+
 ### lazy.nvim
 
 ```lua
 {
   "nikbrunner/mdn.nvim",
   ft = { "markdown" },
-  opts = {},
 }
 ```
 
@@ -41,9 +46,9 @@ Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 - Task lists (`- [ ]`): continues with empty checkbox
 - Empty items (`- `): terminates (inserts blank line)
 
-### Checkbox Cycle (`<C-CR>`)
+### Checkbox Cycle (`<S-CR>`)
 
-| Step | Starting line    | `<C-CR>` result                      |
+| Step | Starting line    | `<S-CR>` result                      |
 | ---- | ---------------- | ------------------------------------ |
 | 1    | _(blank)_        | `- ` (or configured `bullet_marker`) |
 | 2    | `- buy milk`     | `- [ ] buy milk`                     |
@@ -66,13 +71,13 @@ Works in both Normal and Insert mode.
 ## ⚙️ Configuration
 
 ```lua
-require("mdn").setup({
+vim.g.mdn_config = {
     lists = {
         auto_continue = true,      -- enable/disable list continuation
         bullet_marker = "-",       -- marker for new bullets ("-", "*", "+")
     },
     mappings = {
-      cycle_key = "<C-CR>",      -- bullet/checkbox cycle key (set to "" to disable)
+      cycle_key = "<S-CR>",      -- bullet/checkbox cycle key (set to "" to disable)
     },
     conceal = {
       listitem = { pattern = "[-+*]%s", replace = " " },
@@ -84,8 +89,10 @@ require("mdn").setup({
       event = { pattern = "%[o%]%s", replace = "󰃭 " },
       canceled = { pattern = "%[%-]%s", replace = "󱋭 " },
     },
-})
+}
 ```
+
+Set `vim.g.mdn_config` before the package manager loads the plugin.
 
 ## 📖 Documentation
 

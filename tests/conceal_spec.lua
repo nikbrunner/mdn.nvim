@@ -5,13 +5,18 @@ local Config = require("mdn.config")
 
 describe("conceal rendering", function()
   local buf
+  local original_conceallevel
 
   before_each(function()
     buf = vim.api.nvim_create_buf(true, false)
     vim.api.nvim_set_current_buf(buf)
+    require("mdn")
+    original_conceallevel = vim.wo.conceallevel
+    vim.wo.conceallevel = 3
   end)
 
   after_each(function()
+    vim.wo.conceallevel = original_conceallevel
     Config.setup()
     if buf and vim.api.nvim_buf_is_valid(buf) then
       pcall(vim.api.nvim_buf_delete, buf, { force = true })
@@ -65,6 +70,44 @@ describe("conceal rendering", function()
       assert.are.same({ { expected[index], "Conceal" } }, mark[4].virt_text)
       assert.are.equal("inline", mark[4].virt_text_pos)
     end
+  end)
+
+  it("does not render virtual signs when conceallevel is zero", function()
+    vim.wo.conceallevel = 0
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- item", "not a list" })
+    vim.api.nvim_win_set_cursor(0, { 2, 0 })
+    Conceal.render(buf)
+
+    local marks = vim.api.nvim_buf_get_extmarks(buf, Config.conceal_ns, 0, -1, {})
+    assert.are.equal(0, #marks)
+  end)
+
+  it("clears virtual signs when conceallevel is set to zero", function()
+    vim.bo[buf].filetype = "markdown"
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- item", "not a list" })
+    vim.api.nvim_win_set_cursor(0, { 2, 0 })
+    Conceal.render(buf)
+    assert.are.equal(1, #vim.api.nvim_buf_get_extmarks(buf, Config.conceal_ns, 0, -1, {}))
+
+    vim.cmd("setlocal conceallevel=0")
+
+    local marks = vim.api.nvim_buf_get_extmarks(buf, Config.conceal_ns, 0, -1, {})
+    assert.are.equal(0, #marks)
+  end)
+
+  it("renders virtual signs when conceallevel is set to two", function()
+    vim.bo[buf].filetype = "markdown"
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [ ] item", "not a list" })
+    vim.api.nvim_win_set_cursor(0, { 2, 0 })
+    vim.wo.conceallevel = 0
+    Conceal.render(buf)
+
+    vim.cmd("setlocal conceallevel=2")
+    vim.cmd("redraw!")
+
+    local marks = vim.api.nvim_buf_get_extmarks(buf, Config.conceal_ns, 0, -1, {})
+    assert.are.equal(1, #marks)
+    assert.are.equal("󰄱", vim.fn.screenstring(1, 1))
   end)
 
   it("uses configured symbols", function()

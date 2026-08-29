@@ -1,7 +1,7 @@
--- Mdn.nvim user commands.
--- The require() is inside callbacks — the main module is only loaded
--- when the user actually invokes a command (lazy-loading).
+-- Mdn.nvim plugin entrypoint.
+require("mdn")
 
+-- Command modules are loaded only when a command is invoked.
 local sub_cmds = {
   toggle = function(opts)
     if opts.range > 0 then

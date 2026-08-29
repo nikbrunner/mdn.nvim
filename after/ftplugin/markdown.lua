@@ -1,10 +1,5 @@
 ---Mdn.nvim Markdown buffer-local keymaps
 
-local ok, mdn = pcall(require, "mdn")
-if not (ok and mdn.did_setup) then
-  return
-end
-
 -- Capture the buffer this ftplugin is sourced for — deferring and relying on
 -- "current buffer" would attach maps to whatever buffer has focus by then.
 local buf = vim.api.nvim_get_current_buf()

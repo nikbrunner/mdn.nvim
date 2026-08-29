@@ -32,7 +32,7 @@ things you miss most when editing Markdown in Neovim.
   - Empty list items terminate continuation
   - Works with indented/nested lists
 
-- Bullet/checkbox cycle on <C-CR>
+- Bullet/checkbox cycle on <S-CR>
   - 1. Blank/non-list line → creates bullet (uses configured bullet_marker)
   - 2. Bullet exists → adds "[ ] " after marker
   - 3. [ ] → [~] (unchecked → in progress)
@@ -43,7 +43,8 @@ things you miss most when editing Markdown in Neovim.
 
 - Concealed list and checkbox markers
   - Unordered list markers display as the configured listitem symbol
-  - [ ], [x]/[X], [~], [>], [<], [o], and [-] display as their configured symbols
+  - [ ], [x]/[X], [~], [>], [<], [o], and [-] display as their
+    configured symbols
   - Checkbox lines replace the complete `- [state]` prefix with one symbol
   - Symbols include two spaces before the item text
   - The Markdown source remains unchanged
@@ -62,37 +63,35 @@ For insert-mode line indent/outdent, use Neovim's built-in |i_CTRL-T| and
 ==============================================================================
 4. INSTALLATION                                        *mdn-installation*
 
+USING VIM.PACK (NEOVIM 0.12+) ~
+>
+  vim.pack.add({ "https://github.com/nikbrunner/mdn.nvim" }, { load = true })
+<
+
 USING LAZY.NVIM ~
 >
   {
     "nikbrunner/mdn.nvim",
     ft = { "markdown" },
-    opts = {},
   }
-<
-
-USING VIM.PACK ~
->
-  vim.pack.add("https://github.com/nikbrunner/mdn.nvim")
-  require("mdn").setup()
 <
 
 ==============================================================================
 5. CONFIGURATION                                            *mdn-config*
 
-mdn.setup({opts}) ~
+vim.g.mdn_config ~
 
-The `mdn.setup()` function configures the plugin with user-provided options.
+Set `vim.g.mdn_config` before the package manager loads the plugin.
 
 DEFAULT CONFIGURATION ~
 >
-  require("mdn").setup({
+  vim.g.mdn_config = {
     lists = {
       auto_continue = true,
       bullet_marker = "-",
     },
     mappings = {
-      cycle_key = "<C-CR>",
+      cycle_key = "<S-CR>",
     },
     conceal = {
       listitem = { pattern = "[-+*]%s", replace = " " },
@@ -104,7 +103,7 @@ DEFAULT CONFIGURATION ~
       event = { pattern = "%[o%]%s", replace = "󰃭 " },
       canceled = { pattern = "%[%-]%s", replace = "󱋭 " },
     },
-  })
+  }
 <
 
 OPTIONS ~
@@ -118,7 +117,7 @@ OPTIONS ~
     bullet from a blank or non-list line. Accepted values: "-",
     "*", "+".
 
-  mappings.cycle_key     (string, default: "<C-CR>")
+  mappings.cycle_key     (string, default: "<S-CR>")
     Key for the bullet/checkbox cycle in both Normal
     and Insert mode. Set to "" to disable.
 
@@ -147,11 +146,11 @@ OPTIONS ~
 
 CYCLING EXAMPLE ~
 >
-  (blank line)    <C-CR>  →  "- " (or configured bullet_marker)
-  "- buy milk"     <C-CR>  →  "- [ ] buy milk"
-  "- [ ] buy milk"  <C-CR>  →  "- [~] buy milk"
-  "- [~] buy milk"  <C-CR>  →  "- [x] buy milk"
-  "- [x] buy milk"  <C-CR>  →  "- buy milk"
+  (blank line)    <S-CR>  →  "- " (or configured bullet_marker)
+  "- buy milk"     <S-CR>  →  "- [ ] buy milk"
+  "- [ ] buy milk"  <S-CR>  →  "- [~] buy milk"
+  "- [~] buy milk"  <S-CR>  →  "- [x] buy milk"
+  "- [x] buy milk"  <S-CR>  →  "- buy milk"
 <
 
 ==============================================================================
@@ -171,7 +170,7 @@ CYCLING EXAMPLE ~
 7. KEYMAPS                                                  *mdn-keymaps*
 
 All keymaps are buffer-local to Markdown buffers. They are set up
-automatically when |mdn.setup()| is called.
+automatically when the plugin loads.
 
 LIST CONTINUATION (when auto_continue = true) ~
 >
@@ -182,19 +181,15 @@ LIST CONTINUATION (when auto_continue = true) ~
 
 CHECKBOX CYCLE ~
 >
-  <C-CR>  (Normal + Insert)  Bullet/checkbox cycle:
+  <S-CR>  (Normal + Insert)  Bullet/checkbox cycle:
     blank → bullet → [ ] → [~] → [x] → bullet
-  <C-CR>  (Visual)           Toggle checkboxes across selected lines
+  <S-CR>  (Visual)           Toggle checkboxes across selected lines
 <
 
 ==============================================================================
 8. API                                                          *mdn-api*
 
-Public functions available after |mdn.setup()|:
-
-                                                                 *mdn.setup()*
-mdn.setup({opts}) ~
-    Configure and enable the plugin. See |mdn-config| for options.
+Public functions are available after the plugin loads:
 
                                                                    *mdn.cycle()*
 mdn.cycle() ~
@@ -204,7 +199,7 @@ mdn.cycle() ~
                                                           *mdn.toggle_checkbox()*
 mdn.toggle_checkbox() ~
     Toggle the checkbox on the current line (or add one). Same as
-    |:Mdn| toggle. Does not create bullet points.
+    `:Mdn toggle`. Does not create bullet points.
 
                                                            *mdn.continue_list()*
 mdn.continue_list() ~

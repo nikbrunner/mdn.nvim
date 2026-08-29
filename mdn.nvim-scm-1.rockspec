@@ -25,6 +25,5 @@ build = {
     ["mdn.list"] = "lua/mdn/list.lua",
     ["mdn.checkbox"] = "lua/mdn/checkbox.lua",
     ["mdn.health"] = "lua/mdn/health.lua",
-    ["mdn.util"] = "lua/mdn/util.lua",
   },
 }

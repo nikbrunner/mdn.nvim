@@ -3,20 +3,9 @@
 ---@class Mdn.Plugin
 local M = {}
 
-M.did_setup = false
-
----Setup the mdn.nvim plugin.
----Must be called once before using other functions.
----@param opts? Mdn.Config plugin options
-function M.setup(opts)
-  if M.did_setup then
-    local Util = require("mdn.util")
-    return Util.warn("mdn.nvim is already setup")
-  end
-  M.did_setup = true
-  require("mdn.config").setup(opts)
-  require("mdn.conceal").setup()
-end
+local Config = require("mdn.config")
+Config.setup(vim.g.mdn_config)
+require("mdn.conceal").setup()
 
 ---Bullet/checkbox cycle: blank → bullet → [ ] → [~] → [x] → bullet.
 ---Works in both Normal and Insert mode.
