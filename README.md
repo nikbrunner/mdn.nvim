@@ -11,7 +11,7 @@
 Most Markdown plugins do too much. mdn.nvim does exactly a few things:
 
 1. **Smart list continuation** — press Enter and the next list item appears automatically
-2. **Four-state checkbox cycle** — `<C-CR>` cycles: blank → bullet → checkbox → toggle
+2. **Bullet/checkbox cycle** — `<C-CR>` cycles: blank → bullet → [ ] → [~] → [x] → bullet
 3. **Concealed list markers** — shows padded symbols for list items and checkbox states; keeps the current line editable
 
 Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
@@ -49,7 +49,7 @@ Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 | 2    | `- buy milk`     | `- [ ] buy milk`                     |
 | 3    | `- [ ] buy milk` | `- [~] buy milk`                     |
 | 4    | `- [~] buy milk` | `- [x] buy milk`                     |
-| 4'   | `- [x] buy milk` | `- [ ] buy milk`                     |
+| 5    | `- [x] buy milk` | `- buy milk`                         |
 
 Works in both Normal and Insert mode.
 
@@ -72,7 +72,7 @@ require("mdn").setup({
         bullet_marker = "-",       -- marker for new bullets ("-", "*", "+")
     },
     mappings = {
-      cycle_key = "<C-CR>",      -- four-state cycle key (set to "" to disable)
+      cycle_key = "<C-CR>",      -- bullet/checkbox cycle key (set to "" to disable)
     },
     conceal = {
       listitem = { pattern = "[-+*]%s", replace = " " },

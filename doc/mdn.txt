@@ -17,7 +17,7 @@ TABLE OF CONTENTS                                          *mdn-contents*
 1. INTRODUCTION                                              *mdn-intro*
 
 mdn.nvim is a minimal Neovim plugin for Markdown editing that provides
-smart list continuation and a four-state checkbox cycle.
+smart list continuation and a bullet/checkbox cycle.
 
 It's deliberately small — no wikilinks, no tables, no ToC. Just the
 things you miss most when editing Markdown in Neovim.
@@ -32,12 +32,13 @@ things you miss most when editing Markdown in Neovim.
   - Empty list items terminate continuation
   - Works with indented/nested lists
 
-- Four-state checkbox cycle on <C-CR>
+- Bullet/checkbox cycle on <C-CR>
   - 1. Blank/non-list line → creates bullet (uses configured bullet_marker)
   - 2. Bullet exists → adds "[ ] " after marker
   - 3. [ ] → [~] (unchecked → in progress)
-  - 4. [~] → [x] (in progress → done); [x] → [ ] (done →
-    unchecked, cycle restarts); other checkbox chars → [x]
+  - 4. [~] → [x] (in progress → done)
+  - 5. [x] → plain bullet (done → cycle restarts); other checkbox
+    chars → [x]
   - Same key works in both Normal and Insert mode
 
 - Concealed list and checkbox markers
@@ -118,7 +119,7 @@ OPTIONS ~
     "*", "+".
 
   mappings.cycle_key     (string, default: "<C-CR>")
-    Key for the four-state bullet/checkbox cycle in both Normal
+    Key for the bullet/checkbox cycle in both Normal
     and Insert mode. Set to "" to disable.
 
   conceal.<state>        (table)
@@ -150,7 +151,7 @@ CYCLING EXAMPLE ~
   "- buy milk"     <C-CR>  →  "- [ ] buy milk"
   "- [ ] buy milk"  <C-CR>  →  "- [~] buy milk"
   "- [~] buy milk"  <C-CR>  →  "- [x] buy milk"
-  "- [x] buy milk"  <C-CR>  →  "- [ ] buy milk"
+  "- [x] buy milk"  <C-CR>  →  "- buy milk"
 <
 
 ==============================================================================
@@ -181,8 +182,8 @@ LIST CONTINUATION (when auto_continue = true) ~
 
 CHECKBOX CYCLE ~
 >
-  <C-CR>  (Normal + Insert)  Four-state cycle: blank → bullet → [ ] →
-    [~] → [x] → [ ]
+  <C-CR>  (Normal + Insert)  Bullet/checkbox cycle:
+    blank → bullet → [ ] → [~] → [x] → bullet
   <C-CR>  (Visual)           Toggle checkboxes across selected lines
 <
 
@@ -197,7 +198,7 @@ mdn.setup({opts}) ~
 
                                                                    *mdn.cycle()*
 mdn.cycle() ~
-    Run the four-state cycle on the current line. Works in both
+    Run the bullet/checkbox cycle on the current line. Works in both
     Normal and Insert mode.
 
                                                           *mdn.toggle_checkbox()*

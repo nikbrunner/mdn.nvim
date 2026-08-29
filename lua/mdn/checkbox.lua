@@ -4,14 +4,14 @@ local Config = require("mdn.config")
 local List = require("mdn.list")
 local M = {}
 
----Four-state cycle: blank → bullet → unchecked → in-progress → done → ...
+---Cycle: blank → bullet → unchecked → in-progress → done → bullet → ...
 ---
 ---State 1: Blank or non-list line → insert bullet marker
 ---State 2: List item without checkbox → add "[ ] " after marker
 ---State 3: Checkbox present:
 ---  [ ]  → [~] (unchecked → in progress)
 ---  [~]  → [x] (in progress → done)
----  [x]  → [ ] (done → unchecked, cycle restarts)
+---  [x]  → plain bullet (done → cycle restarts)
 ---  other → [x] (complete non-standard checkbox)
 ---
 ---Uses Config.lists.bullet_marker for the bullet character (default: "-").
@@ -40,7 +40,7 @@ function M.cycle()
 
   if task_state then
     -- State 3: Cycle through checkbox states
-    -- [ ] → [~] → [x] → [ ] (continuous cycle)
+    -- [ ] → [~] → [x] → plain bullet (continuous cycle)
     -- Other checkbox chars → [x] (complete to done)
     local cb_char = lcontent.text:match("^%[(.)%]")
     if cb_char == " " then
@@ -52,9 +52,14 @@ function M.cycle()
       local new_line = line:gsub("%[~%]", "[x]", 1)
       vim.api.nvim_set_current_line(new_line)
     elseif cb_char == "x" or cb_char == "X" then
-      -- [x] → [ ] (done → unchecked, restart cycle)
-      local new_line = line:gsub("%[[xX]%]", "[ ]", 1)
+      -- [x] → plain bullet (done → restart cycle)
+      local checkbox = line:match("%[[xX]%]%s*")
+      local new_line = line:gsub("%[[xX]%]%s*", "", 1)
       vim.api.nvim_set_current_line(new_line)
+      local content_start_col = #lcontent.indent + #lcontent.marker + #lcontent.separator + 2
+      if cursor_col >= content_start_col then
+        cursor_col = math.max(content_start_col, cursor_col - #checkbox)
+      end
     else
       -- Other checkbox chars → [x] (complete to done)
       local new_line = line:gsub("%[(.)%]", "[x]", 1)

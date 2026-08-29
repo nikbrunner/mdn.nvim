@@ -34,7 +34,7 @@ function M.check()
   if Config.mappings.cycle_key ~= "" then
     vim.health.ok(("cycle key is set to '%s'"):format(Config.mappings.cycle_key))
   else
-    vim.health.warn("cycle_key is empty — four-state cycle is disabled")
+    vim.health.warn("cycle_key is empty — bullet/checkbox cycle is disabled")
   end
 
   if Config.lists.bullet_marker then

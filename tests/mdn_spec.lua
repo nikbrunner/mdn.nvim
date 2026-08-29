@@ -224,9 +224,9 @@ describe("list resolver", function()
 end)
 
 -- ============================================================
--- Three-State Cycle Tests (buffer-based)
+-- Bullet/Checkbox Cycle Tests (buffer-based)
 -- ============================================================
-describe("three-state cycle", function()
+describe("bullet/checkbox cycle", function()
   local buf
 
   before_each(function()
@@ -308,20 +308,20 @@ describe("three-state cycle", function()
       assert.are.equal("- [~] todo", line)
     end)
 
-    it("toggles checked to unchecked", function()
+    it("cycles checked to a plain bullet", function()
       vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [x] done" })
       vim.fn.cursor(1, 1)
       Checkbox.cycle()
       local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
-      assert.are.equal("- [ ] done", line)
+      assert.are.equal("- done", line)
     end)
 
-    it("toggles uppercase X to unchecked", function()
+    it("cycles uppercase X to a plain bullet", function()
       vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [X] done" })
       vim.fn.cursor(1, 1)
       Checkbox.cycle()
       local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
-      assert.are.equal("- [ ] done", line)
+      assert.are.equal("- done", line)
     end)
 
     it("completes in-progress [~] to checked", function()
@@ -357,8 +357,8 @@ describe("three-state cycle", function()
     end)
   end)
 
-  describe("full four-state cycle", function()
-    it("cycles blank → bullet → [ ] → [~] → [x] → [ ]", function()
+  describe("full cycle", function()
+    it("cycles blank → bullet → [ ] → [~] → [x] → bullet → [ ]", function()
       -- State 1: blank → bullet
       vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
       vim.fn.cursor(1, 1)
@@ -380,7 +380,11 @@ describe("three-state cycle", function()
       Checkbox.cycle()
       assert.are.equal("- [x] buy milk", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
 
-      -- State 4 (again): [x] → [ ]
+      -- State 5: [x] → plain bullet
+      Checkbox.cycle()
+      assert.are.equal("- buy milk", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+
+      -- State 2 (again): plain bullet → [ ]
       Checkbox.cycle()
       assert.are.equal("- [ ] buy milk", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
     end)
@@ -435,12 +439,12 @@ describe("cursor position", function()
       assert.are.equal(7, vim.fn.col(".")) -- same column
     end)
 
-    it("check→uncheck: cursor stays put", function()
+    it("checked → plain bullet: cursor follows the item text", function()
       vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [x] done" })
       vim.fn.cursor(1, 7) -- cursor on 'd'
       Checkbox.cycle()
-      assert.are.equal("- [ ] done", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
-      assert.are.equal(7, vim.fn.col("."))
+      assert.are.equal("- done", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+      assert.are.equal(3, vim.fn.col("."))
     end)
   end)
 

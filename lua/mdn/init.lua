@@ -18,7 +18,7 @@ function M.setup(opts)
   require("mdn.conceal").setup()
 end
 
----Four-state cycle: blank → bullet → checkbox → toggle.
+---Bullet/checkbox cycle: blank → bullet → [ ] → [~] → [x] → bullet.
 ---Works in both Normal and Insert mode.
 function M.cycle()
   require("mdn.checkbox").cycle()
