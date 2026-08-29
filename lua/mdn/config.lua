@@ -31,7 +31,7 @@ local defaults = {
     bullet_marker = "-",
   },
   mappings = {
-    cycle_key = "<C-t>",
+    cycle_key = "<S-CR>",
   },
   conceal = {
     listitem = { pattern = "[-+*]%s", replace = " " },
