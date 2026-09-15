@@ -21,6 +21,7 @@ build = {
   type = "builtin",
   modules = {
     ["mdn"] = "lua/mdn/init.lua",
+    ["mdn.conceal"] = "lua/mdn/conceal.lua",
     ["mdn.config"] = "lua/mdn/config.lua",
     ["mdn.patterns"] = "lua/mdn/patterns.lua",
     ["mdn.list"] = "lua/mdn/list.lua",
