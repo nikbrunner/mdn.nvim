@@ -15,7 +15,7 @@ local M = {}
 ---@param line string
 ---@return MdnListContent?
 function M.resolve_list_content(line)
-  vim.validate("line", line, "string")
+  vim.validate({ line = { line, "string" } })
 
   -- Try ordered list first
   local ol_indent, ol_marker, ol_separator, ol_text = line:match(P.ordered_list)
@@ -161,7 +161,7 @@ end
 ---Insert a new list item below or above the current line.
 ---@param key '"o"'|'"O"'|'"<CR>"' Which key triggered the continuation
 function M.continue(key)
-  vim.validate("key", key, "string")
+  vim.validate({ key = { key, "string" } })
 
   local lnum = vim.fn.line(".")
   local line = vim.api.nvim_get_current_line()

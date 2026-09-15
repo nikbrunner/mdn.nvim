@@ -6,6 +6,8 @@ local buf = vim.api.nvim_get_current_buf()
 
 local Config = require("mdn.config")
 
+require("mdn.render").attach(buf)
+
 -- List continuation (only when auto_continue is enabled)
 if Config.lists.auto_continue then
   vim.keymap.set("i", "<CR>", function()

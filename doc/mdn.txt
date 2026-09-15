@@ -41,6 +41,13 @@ things you miss most when editing Markdown in Neovim.
     chars → [x]
   - Same key works in both Normal and Insert mode
 
+- Stable Markdown rendering
+  - Valid links display as labels without a reserved trailing cell
+  - Code-fence delimiters and language markers are concealed character-wise
+  - Fence rows and all code payload remain visible while editing
+  - The cursor reveals source independently in each window
+  - Missing Markdown parser or query support leaves readable source
+
 - Concealed list and checkbox markers
   - Unordered list markers display as the configured listitem symbol
   - [ ], [x]/[X], [~], [>], [<], [o], and [-] display as their
@@ -93,6 +100,10 @@ DEFAULT CONFIGURATION ~
     mappings = {
       cycle_key = "<S-CR>",
     },
+    rendering = {
+      conceallevel = 2,
+      concealcursor = "",
+    },
     conceal = {
       listitem = { pattern = "[-+*]%s", replace = " " },
       unchecked = { pattern = "%[%s%]%s", replace = "󰄱 " },
@@ -120,6 +131,14 @@ OPTIONS ~
   mappings.cycle_key     (string, default: "<S-CR>")
     Key for the bullet/checkbox cycle in both Normal
     and Insert mode. Set to "" to disable.
+
+  rendering.conceallevel (integer, default: 2)
+    Window-local Markdown conceal level. Accepted values are 0 through 3.
+
+  rendering.concealcursor (string, default: "")
+    Modes that keep conceal active on the cursor line. Use each of n, v,
+    i, and c at most once. The empty default reveals source on the cursor
+    line.
 
   conceal.<state>        (table)
     Rule for a list marker or checkbox state. Each rule contains:
@@ -227,6 +246,7 @@ LINTING & FORMATTING ~
   make lint                    # Style check with StyLua
   make format                  # Auto-format with StyLua
   make check                   # Run all: lint + typecheck + test
+  make rockspec-check          # Verify packaged modules and runtime files
 <
 
  vim:tw=78:ts=8:ft=help:norl:

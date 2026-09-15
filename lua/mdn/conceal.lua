@@ -38,7 +38,7 @@ end
 ---Render list markers and supported checkbox states in a buffer.
 ---@param buf integer Buffer id
 function M.render(buf)
-  vim.validate("buf", buf, "number")
+  vim.validate({ buf = { buf, "number" } })
 
   vim.api.nvim_buf_clear_namespace(buf, Config.conceal_ns, 0, -1)
   if vim.wo.conceallevel == 0 then

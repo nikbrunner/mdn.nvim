@@ -2,6 +2,7 @@
 ---@field lists? Mdn.ListsOptions
 ---@field mappings? Mdn.MappingsOptions
 ---@field conceal? Mdn.ConcealOptions
+---@field rendering? Mdn.RenderingOptions
 local M = {}
 
 ---@class Mdn.ListsOptions
@@ -10,6 +11,10 @@ local M = {}
 
 ---@class Mdn.MappingsOptions
 ---@field cycle_key string Key for four-state cycle: blank → bullet → checkbox → toggle (set to "" to disable)
+
+---@class Mdn.RenderingOptions
+---@field conceallevel integer Markdown window conceal level (default: 2)
+---@field concealcursor string Modes which keep conceal active on the cursor line (default: "")
 
 ---@class Mdn.ConcealRule
 ---@field pattern string Lua pattern for the source text to conceal
@@ -33,6 +38,10 @@ local defaults = {
   mappings = {
     cycle_key = "<S-CR>",
   },
+  rendering = {
+    conceallevel = 2,
+    concealcursor = "",
+  },
   conceal = {
     listitem = { pattern = "[-+*]%s", replace = " " },
     unchecked = { pattern = "%[%s%]%s", replace = "󰄱 " },
@@ -52,6 +61,7 @@ local config = vim.deepcopy(defaults)
 M.augroup = vim.api.nvim_create_augroup("mdn", { clear = true })
 M.ns = vim.api.nvim_create_namespace("mdn")
 M.conceal_ns = vim.api.nvim_create_namespace("mdn.conceal")
+M.render_ns = vim.api.nvim_create_namespace("mdn.render")
 
 setmetatable(M, {
   __index = function(_, key)
@@ -64,18 +74,34 @@ setmetatable(M, {
 function M.setup(opts)
   config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), opts or {})
 
-  -- Validate config
-  vim.validate("auto_continue", config.lists.auto_continue, "boolean")
-  if config.mappings.cycle_key then
-    vim.validate("cycle_key", config.mappings.cycle_key, "string")
+  -- Use the table form for Neovim 0.10 compatibility.
+  vim.validate({
+    auto_continue = { config.lists.auto_continue, "boolean" },
+    cycle_key = { config.mappings.cycle_key, "string", true },
+    bullet_marker = { config.lists.bullet_marker, "string", true },
+    ["rendering.conceallevel"] = { config.rendering.conceallevel, "number" },
+    ["rendering.concealcursor"] = { config.rendering.concealcursor, "string" },
+  })
+  if
+    config.rendering.conceallevel % 1 ~= 0
+    or config.rendering.conceallevel < 0
+    or config.rendering.conceallevel > 3
+  then
+    error("rendering.conceallevel must be an integer from 0 through 3")
   end
-  if config.lists.bullet_marker then
-    vim.validate("bullet_marker", config.lists.bullet_marker, "string")
+  local seen_modes = {}
+  for mode in config.rendering.concealcursor:gmatch(".") do
+    if not mode:match("^[nvic]$") or seen_modes[mode] then
+      error("rendering.concealcursor must contain unique mode characters from 'nvic'")
+    end
+    seen_modes[mode] = true
   end
   for name, rule in pairs(config.conceal) do
-    vim.validate("conceal." .. name, rule, "table")
-    vim.validate("conceal." .. name .. ".pattern", rule.pattern, "string")
-    vim.validate("conceal." .. name .. ".replace", rule.replace, "string")
+    vim.validate({
+      ["conceal." .. name] = { rule, "table" },
+      ["conceal." .. name .. ".pattern"] = { rule.pattern, "string" },
+      ["conceal." .. name .. ".replace"] = { rule.replace, "string" },
+    })
   end
 end
 

@@ -4,11 +4,12 @@ source = {
   url = "git+https://github.com/nikbrunner/mdn.nvim.git",
 }
 description = {
-  summary = "Minimal Markdown utilities for Neovim: smart list continuation and checkbox toggling",
+  summary = "Minimal Markdown editing and rendering utilities for Neovim",
   detailed = [[
-    mdn.nvim provides two focused features for Markdown editing:
+    mdn.nvim provides focused Markdown editing and rendering features:
     - Smart list continuation on Enter/o/O (ordered, unordered, task lists)
     - Checkbox toggling in both Normal and Insert mode
+    - Stable link and fenced-code conceal rendering
   ]],
   homepage = "https://github.com/nikbrunner/mdn.nvim",
   license = "MIT",
@@ -25,5 +26,7 @@ build = {
     ["mdn.list"] = "lua/mdn/list.lua",
     ["mdn.checkbox"] = "lua/mdn/checkbox.lua",
     ["mdn.health"] = "lua/mdn/health.lua",
+    ["mdn.render"] = "lua/mdn/render.lua",
   },
+  copy_directories = { "after", "plugin", "doc" },
 }

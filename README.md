@@ -13,6 +13,7 @@ Most Markdown plugins do too much. mdn.nvim does exactly a few things:
 1. **Smart list continuation** — press Enter and the next list item appears automatically
 2. **Bullet/checkbox cycle** — `<S-CR>` cycles: blank → bullet → [ ] → [~] → [x] → bullet
 3. **Concealed list markers** — shows padded symbols for list items and checkbox states; keeps the current line editable
+4. **Stable Markdown rendering** — shows links as labels and hides fence markers without collapsing source rows or payload
 
 Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 
@@ -79,6 +80,10 @@ vim.g.mdn_config = {
     mappings = {
       cycle_key = "<S-CR>",      -- bullet/checkbox cycle key (set to "" to disable)
     },
+    rendering = {
+      conceallevel = 2,          -- Markdown window conceal level (0 through 3)
+      concealcursor = "",        -- modes that keep conceal active on the cursor line
+    },
     conceal = {
       listitem = { pattern = "[-+*]%s", replace = " " },
       unchecked = { pattern = "%[%s%]%s", replace = "󰄱 " },
@@ -93,6 +98,13 @@ vim.g.mdn_config = {
 ```
 
 Set `vim.g.mdn_config` before the package manager loads the plugin.
+
+By default, valid links render without brackets, destinations, or a trailing
+reserved cell. Fenced-code delimiters and language markers are hidden while
+both fence rows and all payload remain visible. Moving a window's cursor onto a
+concealed source line reveals that line; separate windows reveal independently.
+If the Markdown parser or highlight query is unavailable, mdn.nvim leaves the
+source readable without raising an error.
 
 ## 📖 Documentation
 
