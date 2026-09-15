@@ -115,14 +115,9 @@ local function screen_text(win, buffer_row, width)
   return table.concat(chars)
 end
 
-local function has_screen()
-  vim.cmd("redraw!")
-  return vim.fn.screenchar(1, 1) >= 0
-end
-
 local function run_screen_scenario(scenario)
   local result = vim
-    .system({ "nvim", "--clean", "--headless", "-l", "tests/render_screen.lua", scenario }, { text = true })
+    .system({ "python3", "tests/run_render_screen.py", vim.v.progpath, "tests/render_screen.lua", scenario }, { text = true })
     :wait()
   if result.code ~= 0 then
     error(result.stderr)
@@ -380,44 +375,14 @@ describe("hybrid Markdown rendering", function()
   end)
 
   it("renders links without a trailing cell and preserves fence and payload rows", function()
-    if not has_markdown_parser() then
-      return
-    end
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
-      "before",
-      "[label](https://example.com)next",
-      "```lua",
-      "payload",
-      "```",
-      "after",
-    })
-    vim.api.nvim_win_set_cursor(original_win, { 1, 0 })
-    Render.setup()
-    Render.render(buf)
-    vim.treesitter.start(buf, "markdown")
-    vim.cmd("redraw!")
-    if not has_screen() then
-      return
-    end
-
-    assert.are.equal("labelnext", screen_text(original_win, 2, 9))
-    assert.are.equal("       ", screen_text(original_win, 3, 7))
-    assert.are.equal("payload", screen_text(original_win, 4, 7))
-    assert.are.equal("       ", screen_text(original_win, 5, 7))
-    assert.are.equal("after", screen_text(original_win, 6, 5))
+    run_screen_scenario("link")
   end)
 
   it("keeps payload and both fence rows through an Insert-mode edit beside the closing fence", function()
-    if not has_screen() then
-      return
-    end
     run_screen_scenario("insert")
   end)
 
   it("reveals fence and link source independently in two windows", function()
-    if not has_screen() then
-      return
-    end
     run_screen_scenario("windows")
   end)
 end)

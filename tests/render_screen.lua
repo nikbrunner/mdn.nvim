@@ -1,7 +1,6 @@
-local scenario = assert(arg[1], "screen scenario is required")
+local scenario = assert(vim.env.MDN_SCREEN_SCENARIO, "screen scenario is required")
+assert(#vim.api.nvim_list_uis() > 0, "screen scenarios require an attached UI")
 
-vim.o.lines = 20
-vim.o.columns = 100
 vim.opt.runtimepath:prepend(vim.uv.cwd())
 
 local Config = require("mdn.config")
@@ -26,13 +25,46 @@ local function equal(expected, actual)
   assert(expected == actual, ("expected %q, got %q"):format(expected, actual))
 end
 
-if scenario == "insert" then
+local function wait_for_screen(check, message)
+  local ok = vim.wait(2000, function()
+    vim.treesitter.get_parser(buf, "markdown"):parse()
+    vim.cmd("redraw!")
+    return check()
+  end, 10)
+  assert(ok, message)
+end
+
+if scenario == "link" then
   local win = vim.api.nvim_get_current_win()
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "```lua", "payload", "```", "after" })
-  vim.api.nvim_win_set_cursor(0, { 3, 0 })
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+    "before",
+    "[label](https://example.com)next",
+    "```lua",
+    "payload",
+    "```",
+    "after",
+  })
+  vim.api.nvim_win_set_cursor(win, { 1, 0 })
   Render.render(buf)
   vim.treesitter.start(buf, "markdown")
-  vim.cmd("redraw!")
+  wait_for_screen(function()
+    return screen_text(win, 2, 9) == "labelnext"
+  end, "link never rendered without a trailing gap")
+
+  equal("labelnext", screen_text(win, 2, 9))
+  equal("       ", screen_text(win, 3, 7))
+  equal("payload", screen_text(win, 4, 7))
+  equal("       ", screen_text(win, 5, 7))
+  equal("after", screen_text(win, 6, 5))
+elseif scenario == "insert" then
+  local win = vim.api.nvim_get_current_win()
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "```lua", "payload", "```", "after" })
+  vim.api.nvim_win_set_cursor(win, { 3, 0 })
+  Render.render(buf)
+  vim.treesitter.start(buf, "markdown")
+  wait_for_screen(function()
+    return screen_text(win, 2, 7) == "payload" and screen_text(win, 3, 10):match("```") ~= nil
+  end, "initial fence screen did not stabilize")
   equal("       ", screen_text(win, 1, 7))
   equal("payload", screen_text(win, 2, 7))
   assert(screen_text(win, 3, 10):match("```"))
@@ -40,9 +72,10 @@ if scenario == "insert" then
 
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("Oinserted<Esc>", true, false, true), "x", false)
   equal("inserted", vim.api.nvim_buf_get_lines(buf, 2, 3, false)[1])
-  vim.api.nvim_win_set_cursor(0, { 3, 0 })
+  vim.api.nvim_win_set_cursor(win, { 3, 0 })
   local during = {}
   _G.mdn_render_capture_insert = function()
+    vim.treesitter.get_parser(buf, "markdown"):parse()
     vim.cmd("redraw!")
     during.mode = vim.api.nvim_get_mode().mode
     during.payload = screen_text(win, 3, 9)
@@ -60,8 +93,10 @@ if scenario == "insert" then
   equal("       ", during.closing)
 
   equal("inserted!", vim.api.nvim_buf_get_lines(buf, 2, 3, false)[1])
-  vim.api.nvim_win_set_cursor(0, { 4, 0 })
-  vim.cmd("redraw!")
+  vim.api.nvim_win_set_cursor(win, { 4, 0 })
+  wait_for_screen(function()
+    return screen_text(win, 4, 10):match("```") ~= nil
+  end, "closing fence source did not return on its cursor line")
   equal("       ", screen_text(win, 1, 7))
   equal("payload", screen_text(win, 2, 7))
   equal("inserted!", screen_text(win, 3, 9))
@@ -83,12 +118,16 @@ elseif scenario == "windows" then
   vim.api.nvim_win_set_cursor(second_win, { 4, 0 })
 
   vim.api.nvim_set_current_win(first_win)
-  vim.cmd("redraw!")
+  wait_for_screen(function()
+    return screen_text(first_win, 1, 28):match("```lua") ~= nil
+  end, "first window did not reveal fence source")
   assert(screen_text(first_win, 1, 28):match("```lua"))
   equal("label", screen_text(first_win, 4, 5))
 
   vim.api.nvim_set_current_win(second_win)
-  vim.cmd("redraw!")
+  wait_for_screen(function()
+    return screen_text(second_win, 4, 28):match("%[label%]") ~= nil
+  end, "second window did not reveal link source")
   equal("     ", screen_text(second_win, 1, 5))
   assert(screen_text(second_win, 4, 28):match("%[label%]"))
 else
