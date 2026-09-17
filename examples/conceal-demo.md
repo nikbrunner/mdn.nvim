@@ -17,6 +17,21 @@ Before [label only](https://example.com) directly after.
 
 Move the cursor onto that line. The full `[label](url)` source should reappear.
 
+## Tables
+
+Set `concealcursor` to `n`, then move through this table in Normal mode. Bold
+and link delimiters should remain concealed on the cursor row, so every row keeps
+the same layout. Start Insert mode on a cell to reveal its source for editing.
+
+```vim
+:setlocal concealcursor=n
+```
+
+| Status | Score | Detail |
+| ------ | ----- | ------ |
+| Passing | **100%** | [updated](https://example.com) |
+| Pending | **67%** | [previous](https://example.com) |
+
 Malformed source should stay readable rather than swallowing nearby text:
 
 Before [unfinished](https://example.com directly after.
