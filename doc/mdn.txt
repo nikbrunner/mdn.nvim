@@ -57,6 +57,7 @@ things you miss most when editing Markdown in Neovim.
   - The Markdown source remains unchanged
   - Virtual symbols remain visible with 'conceallevel' set to 3
   - Virtual symbols are hidden on the cursor line for editing
+  - Visual Block selections reveal source on every selected row
 
 For insert-mode line indent/outdent, use Neovim's built-in |i_CTRL-T| and
 |i_CTRL-D|.

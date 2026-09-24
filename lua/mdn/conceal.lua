@@ -28,6 +28,20 @@ local function add_mark(buf, row, start_col, end_col, symbol)
   vim.api.nvim_buf_set_extmark(buf, Config.conceal_ns, row, start_col, opts)
 end
 
+local function get_visual_block_range(buf)
+  if
+    vim.api.nvim_get_current_buf() ~= buf
+    or vim.wo.concealcursor:find("v", 1, true)
+    or vim.fn.mode(1):sub(1, 1) ~= "\22"
+  then
+    return
+  end
+
+  local visual_row = vim.fn.getpos("v")[2] - 1
+  local cursor_row = vim.api.nvim_win_get_cursor(0)[1] - 1
+  return math.min(visual_row, cursor_row), math.max(visual_row, cursor_row)
+end
+
 local function find_rule_end(line, start_col, rule)
   local match_start, match_end = line:find(rule.pattern, start_col + 1)
   if match_start == start_col + 1 then
@@ -39,6 +53,9 @@ end
 ---@param buf integer Buffer id
 function M.render(buf)
   vim.validate({ buf = { buf, "number" } })
+  if buf == 0 then
+    buf = vim.api.nvim_get_current_buf()
+  end
 
   vim.api.nvim_buf_clear_namespace(buf, Config.conceal_ns, 0, -1)
   if vim.wo.conceallevel == 0 then
@@ -50,10 +67,12 @@ function M.render(buf)
   if vim.api.nvim_get_current_buf() == buf then
     cursor_row = vim.api.nvim_win_get_cursor(0)[1] - 1
   end
+  local visual_start, visual_end = get_visual_block_range(buf)
 
   for row, line in ipairs(lines) do
     local row_index = row - 1
-    if row_index ~= cursor_row then
+    local selected = visual_start and row_index >= visual_start and row_index <= visual_end
+    if row_index ~= cursor_row and not selected then
       local lcontent = List.resolve_list_content(line)
       if lcontent then
         local list_start = #lcontent.indent
@@ -97,7 +116,7 @@ end
 ---Enable automatic conceal rendering for Markdown buffers.
 function M.setup()
   vim.api.nvim_create_autocmd(
-    { "BufEnter", "TextChanged", "TextChangedI", "CursorMoved", "CursorMovedI", "FileType" },
+    { "BufEnter", "TextChanged", "TextChangedI", "CursorMoved", "CursorMovedI", "FileType", "ModeChanged" },
     {
       group = Config.augroup,
       pattern = "*",

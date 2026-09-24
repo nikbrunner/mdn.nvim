@@ -130,6 +130,38 @@ describe("conceal rendering", function()
     assert.are.same({ { "U ", "Conceal" } }, marks[2][4].virt_text)
   end)
 
+  it("hides virtual signs on every line in a visual block selection", function()
+    vim.bo[buf].filetype = "markdown"
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+      "- [ ] first",
+      "- [x] second",
+      "- [ ] third",
+      "- [x] fourth",
+    })
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+    Conceal.render(buf)
+
+    _G.mdn_capture_visual_block = function()
+      Conceal.render(buf)
+      _G.mdn_visual_block_mode = vim.fn.mode(1)
+      _G.mdn_visual_block_marks = vim.api.nvim_buf_get_extmarks(buf, Config.conceal_ns, 0, -1, {})
+    end
+    vim.api.nvim_feedkeys(
+      vim.api.nvim_replace_termcodes("<C-v>j<Cmd>lua _G.mdn_capture_visual_block()<CR>", true, false, true),
+      "x",
+      false
+    )
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", false)
+
+    assert.are.equal("\22", _G.mdn_visual_block_mode)
+    assert.are.equal(2, #_G.mdn_visual_block_marks)
+    assert.are.equal(2, _G.mdn_visual_block_marks[1][2])
+    assert.are.equal(3, _G.mdn_visual_block_marks[2][2])
+    _G.mdn_capture_visual_block = nil
+    _G.mdn_visual_block_mode = nil
+    _G.mdn_visual_block_marks = nil
+  end)
+
   it("hides virtual signs on the cursor line", function()
     vim.bo[buf].filetype = "markdown"
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, {

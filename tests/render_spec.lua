@@ -378,6 +378,10 @@ describe("hybrid Markdown rendering", function()
     run_screen_scenario("link")
   end)
 
+  it("reveals checkbox source across Visual Block selections", function()
+    run_screen_scenario("conceal")
+  end)
+
   it("keeps payload and both fence rows through an Insert-mode edit beside the closing fence", function()
     run_screen_scenario("insert")
   end)

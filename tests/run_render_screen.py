@@ -26,7 +26,10 @@ def main() -> int:
         os.environ["MDN_SCREEN_SCENARIO"] = scenario
         command = (
             "local ok, err = xpcall(function() dofile(vim.env.MDN_SCREEN_SCRIPT) end, debug.traceback); "
-            "if ok then vim.cmd('qa!') else io.stderr:write(err .. '\\n'); vim.cmd('cquit') end"
+            "if not ok then io.stderr:write(err .. '\\n'); vim.cmd('cquit') "
+            "elseif vim.g.MDN_SCREEN_ASYNC then vim.defer_fn(function() "
+            "if not vim.g.MDN_SCREEN_DONE then io.stderr:write('screen scenario timed out\\n'); vim.cmd('cquit') end "
+            "end, 20000) else vim.cmd('qa!') end"
         )
         os.execv(nvim, [nvim, "-u", "NONE", "-i", "NONE", "--noplugin", "-c", "lua " + command])
 

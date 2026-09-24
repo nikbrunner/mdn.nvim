@@ -7,6 +7,8 @@ local Config = require("mdn.config")
 Config.setup()
 local Render = require("mdn.render")
 Render.setup()
+local Conceal = require("mdn.conceal")
+Conceal.setup()
 
 local buf = vim.api.nvim_create_buf(false, true)
 vim.api.nvim_set_current_buf(buf)
@@ -101,6 +103,124 @@ elseif scenario == "insert" then
   equal("payload", screen_text(win, 2, 7))
   equal("inserted!", screen_text(win, 3, 9))
   assert(screen_text(win, 4, 10):match("```"))
+elseif scenario == "conceal" then
+  vim.g.MDN_SCREEN_ASYNC = true
+  local win = vim.api.nvim_get_current_win()
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+    "- [ ] first",
+    "- [x] second",
+    "- [ ] third",
+  })
+  vim.wo.conceallevel = 2
+  vim.api.nvim_win_set_cursor(win, { 1, 0 })
+  Conceal.render(buf)
+
+  local function contains(row, text)
+    return screen_text(win, row, 20):find(text, 1, true) ~= nil
+  end
+  local function equals(row, text)
+    return screen_text(win, row, #text) == text
+  end
+  local function finish(ok, message)
+    if not ok then
+      io.stderr:write(message .. "\n")
+      vim.cmd("cquit")
+      return
+    end
+    vim.g.MDN_SCREEN_DONE = true
+    vim.cmd("qa!")
+  end
+  local function poll(check, message, next)
+    local deadline = vim.uv.hrtime() + 2e9
+    local function tick()
+      vim.cmd("redraw!")
+      if check() then
+        next()
+      elseif vim.uv.hrtime() < deadline then
+        vim.defer_fn(tick, 10)
+      else
+        finish(false, message)
+      end
+    end
+    vim.schedule(tick)
+  end
+  local steps = {
+    {
+      keys = "<C-v>j",
+      check = function()
+        return vim.fn.mode(1) == "\22"
+          and equals(1, "- [ ] first")
+          and equals(2, "- [x] second")
+          and contains(3, "󰄱")
+      end,
+      message = "Visual Block selection did not reveal its rows and preserve the unselected row",
+    },
+    {
+      keys = "j",
+      check = function()
+        return vim.fn.mode(1) == "\22"
+          and equals(1, "- [ ] first")
+          and equals(2, "- [x] second")
+          and equals(3, "- [ ] third")
+      end,
+      message = "expanding the Visual Block did not reveal the added row",
+    },
+    {
+      keys = "k",
+      check = function()
+        return vim.fn.mode(1) == "\22"
+          and equals(1, "- [ ] first")
+          and equals(2, "- [x] second")
+          and contains(3, "󰄱")
+      end,
+      message = "shrinking the Visual Block did not restore conceal outside the selection",
+    },
+    {
+      keys = "<Esc>",
+      check = function()
+        return vim.fn.mode(1) == "n" and contains(1, "󰄱")
+      end,
+      message = "conceal did not return after leaving Visual Block mode",
+    },
+    {
+      keys = "j<C-v>k",
+      check = function()
+        return vim.fn.mode(1) == "\22"
+          and contains(1, "󰄱")
+          and equals(2, "- [x] second")
+          and equals(3, "- [ ] third")
+      end,
+      message = "upward Visual Block selection did not reveal all selected rows",
+    },
+    {
+      keys = "<Esc>",
+      check = function()
+        return vim.fn.mode(1) == "n" and contains(1, "󰄱") and contains(3, "󰄱")
+      end,
+      message = "conceal did not return after upward selection",
+    },
+  }
+  local function run_step(index)
+    local step = steps[index]
+    if not step then
+      finish(true)
+      return
+    end
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(step.keys, true, false, true), "n", false)
+    poll(step.check, step.message, function()
+      run_step(index + 1)
+    end)
+  end
+
+  poll(
+    function()
+      return contains(2, "󰄲")
+    end,
+    "checkboxes were not concealed before selection",
+    function()
+      run_step(1)
+    end
+  )
 elseif scenario == "windows" then
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
     "```lua",
