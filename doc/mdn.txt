@@ -32,7 +32,7 @@ things you miss most when editing Markdown in Neovim.
   - Empty list items terminate continuation
   - Works with indented/nested lists
 
-- Bullet/checkbox cycle on <S-CR>
+- Bullet/checkbox cycle on <C-k>
   - 1. Blank/non-list line → creates bullet (uses configured bullet_marker)
   - 2. Bullet exists → adds "[ ] " after marker
   - 3. [ ] → [~] (unchecked → in progress)
@@ -99,7 +99,7 @@ DEFAULT CONFIGURATION ~
       bullet_marker = "-",
     },
     mappings = {
-      cycle_key = "<S-CR>",
+      cycle_key = "<C-k>",
     },
     rendering = {
       conceallevel = 2,
@@ -129,9 +129,10 @@ OPTIONS ~
     bullet from a blank or non-list line. Accepted values: "-",
     "*", "+".
 
-  mappings.cycle_key     (string, default: "<S-CR>")
-    Key for the bullet/checkbox cycle in both Normal
-    and Insert mode. Set to "" to disable.
+  mappings.cycle_key     (string, default: "<C-k>")
+    Key for the bullet/checkbox cycle in Normal, Insert, and Visual
+    mode. Set to "" to disable. The default Insert-mode mapping takes
+    precedence over Neovim's |i_CTRL-K| digraph entry.
 
   rendering.conceallevel (integer, default: 2)
     Window-local Markdown conceal level. Accepted values are 0 through 3.
@@ -166,11 +167,11 @@ OPTIONS ~
 
 CYCLING EXAMPLE ~
 >
-  (blank line)    <S-CR>  →  "- " (or configured bullet_marker)
-  "- buy milk"     <S-CR>  →  "- [ ] buy milk"
-  "- [ ] buy milk"  <S-CR>  →  "- [~] buy milk"
-  "- [~] buy milk"  <S-CR>  →  "- [x] buy milk"
-  "- [x] buy milk"  <S-CR>  →  "- buy milk"
+  (blank line)    <C-k>  →  "- " (or configured bullet_marker)
+  "- buy milk"     <C-k>  →  "- [ ] buy milk"
+  "- [ ] buy milk"  <C-k>  →  "- [~] buy milk"
+  "- [~] buy milk"  <C-k>  →  "- [x] buy milk"
+  "- [x] buy milk"  <C-k>  →  "- buy milk"
 <
 
 ==============================================================================
@@ -201,9 +202,9 @@ LIST CONTINUATION (when auto_continue = true) ~
 
 CHECKBOX CYCLE ~
 >
-  <S-CR>  (Normal + Insert)  Bullet/checkbox cycle:
+  <C-k>  (Normal + Insert)  Bullet/checkbox cycle:
     blank → bullet → [ ] → [~] → [x] → bullet
-  <S-CR>  (Visual)           Toggle checkboxes across selected lines
+  <C-k>  (Visual)           Toggle checkboxes across selected lines
 <
 
 ==============================================================================

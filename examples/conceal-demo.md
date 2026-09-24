@@ -61,7 +61,7 @@ Its full Markdown source should reappear on the cursor line.
 - [~] Task in progress
 - [x] Completed task
 
-Put the cursor on a checkbox and press the configured cycle key (`<S-CR>` by
+Put the cursor on a checkbox and press the configured cycle key (`<C-k>` by
 default). The state should advance without changing the task text or indentation.
 
 ## Fenced code

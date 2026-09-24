@@ -11,7 +11,7 @@
 Most Markdown plugins do too much. mdn.nvim does exactly a few things:
 
 1. **Smart list continuation** — press Enter and the next list item appears automatically
-2. **Bullet/checkbox cycle** — `<S-CR>` cycles: blank → bullet → [ ] → [~] → [x] → bullet
+2. **Bullet/checkbox cycle** — `<C-k>` cycles: blank → bullet → [ ] → [~] → [x] → bullet
 3. **Concealed list markers** — shows padded symbols for list items and checkbox states; keeps the current line editable
 4. **Stable Markdown rendering** — shows links as labels and hides fence markers without collapsing source rows or payload
 
@@ -47,9 +47,9 @@ vim.pack.add({ "https://github.com/nikbrunner/mdn.nvim" }, { load = true })
 - Task lists (`- [ ]`): continues with empty checkbox
 - Empty items (`- `): terminates (inserts blank line)
 
-### Checkbox Cycle (`<S-CR>`)
+### Checkbox Cycle (`<C-k>`)
 
-| Step | Starting line    | `<S-CR>` result                      |
+| Step | Starting line    | `<C-k>` result                       |
 | ---- | ---------------- | ------------------------------------ |
 | 1    | _(blank)_        | `- ` (or configured `bullet_marker`) |
 | 2    | `- buy milk`     | `- [ ] buy milk`                     |
@@ -57,7 +57,8 @@ vim.pack.add({ "https://github.com/nikbrunner/mdn.nvim" }, { load = true })
 | 4    | `- [~] buy milk` | `- [x] buy milk`                     |
 | 5    | `- [x] buy milk` | `- buy milk`                         |
 
-Works in both Normal and Insert mode.
+Works in both Normal and Insert mode. The default `<C-k>` mapping takes precedence
+over Neovim's Insert-mode digraph entry in Markdown buffers.
 
 > [!TIP]
 > For indenting/outdenting list items in Insert mode, use Neovim's built-in
@@ -78,7 +79,7 @@ vim.g.mdn_config = {
         bullet_marker = "-",       -- marker for new bullets ("-", "*", "+")
     },
     mappings = {
-      cycle_key = "<S-CR>",      -- bullet/checkbox cycle key (set to "" to disable)
+      cycle_key = "<C-k>",       -- bullet/checkbox cycle key (set to "" to disable)
     },
     rendering = {
       conceallevel = 2,          -- Markdown window conceal level (0 through 3)

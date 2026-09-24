@@ -36,7 +36,7 @@ local defaults = {
     bullet_marker = "-",
   },
   mappings = {
-    cycle_key = "<S-CR>",
+    cycle_key = "<C-k>",
   },
   rendering = {
     conceallevel = 2,
