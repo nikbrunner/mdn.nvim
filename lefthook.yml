@@ -1,0 +1,13 @@
+pre-commit:
+  jobs:
+    - name: lint
+      glob: "*.lua"
+      run: make lint
+    - name: test
+      glob: "*.{lua,scm,py}"
+      run: make test
+
+pre-push:
+  jobs:
+    - name: typecheck
+      run: make typecheck
