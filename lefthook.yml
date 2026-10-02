@@ -9,5 +9,5 @@ pre-commit:
 
 pre-push:
   jobs:
-    - name: typecheck
-      run: make typecheck
+    - name: check
+      run: make check

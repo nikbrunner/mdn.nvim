@@ -41,10 +41,10 @@ nvim -l tests/minit.lua --minitest
 
 ```bash
 # Via Makefile (if available)
-make test-one MODULE=base
+make test-one MODULE=render
 
 # Direct — pass the file path
-nvim -l tests/minit.lua --minitest tests/base_spec.lua
+nvim -l tests/minit.lua --minitest tests/render_spec.lua
 ```
 
 ### Running offline (no network)
@@ -58,7 +58,7 @@ LAZY_OFFLINE=1 nvim -l tests/minit.lua --minitest
 ### With verbose output
 
 ```bash
-nvim -l tests/minit.lua --minitest -v tests/base_spec.lua
+nvim -l tests/minit.lua --minitest -v tests/render_spec.lua
 ```
 
 ## Reading test output
@@ -73,18 +73,18 @@ mini.test reports in headless mode:
 ### Example output
 
 ```
-test_base_spec.lua
+test_render_spec.lua
   describe "setup"
     ✓ it "creates side effects"
     ✓ it "validates config"
   describe "hello"
     ✗ it "returns greeting"
-      tests/base_spec.lua:42: Expected:
+      tests/render_spec.lua:42: Expected:
       "Hello World"
       Got:
       "Hello John Doe"
       stack traceback:
-        tests/base_spec.lua:42: in function <tests/base_spec.lua:41>
+        tests/render_spec.lua:42: in function <tests/render_spec.lua:41>
 ```
 
 ### Diagnosing failures

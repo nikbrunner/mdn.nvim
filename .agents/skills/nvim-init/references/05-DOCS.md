@@ -161,7 +161,7 @@ This creates/updates `doc/tags` so `:help <module>` works.
 
 ## 7. Commit
 
-Use the **nvim-commit** skill to create the commit:
+Use the **repo-commit** skill to create the commit:
 
 ```
 docs!: replace template documentation with plugin description

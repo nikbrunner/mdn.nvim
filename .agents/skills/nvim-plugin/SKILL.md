@@ -79,7 +79,7 @@ When modifying an existing plugin:
 
 ## File locations in this project
 
-- Plugin source: `lua/base/`
+- Plugin source: `lua/mdn/`
 - Tests: `tests/`
-- Plugin commands: `plugin/base.lua`
-- Documentation: `doc/base.txt`
+- Plugin commands: `plugin/mdn.lua`
+- Documentation: `doc/mdn.txt`

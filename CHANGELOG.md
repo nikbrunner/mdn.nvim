@@ -1,5 +1,7 @@
 # Changelog
 
+---
+
 ## [1.0.0](https://github.com/nikbrunner/mdn.nvim/compare/v0.0.1...v1.0.0) (2026-10-02)
 
 

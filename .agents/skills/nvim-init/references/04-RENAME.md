@@ -202,7 +202,7 @@ rg -l 'require\('"'"'base' --glob '!.agents/**' --glob '!.tests/**'
 
 ## 5. Commit
 
-Use the **nvim-commit** skill to create the commit. The commit message should
+Use the **repo-commit** skill to create the commit. The commit message should
 be:
 
 ```
