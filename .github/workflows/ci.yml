@@ -43,5 +43,7 @@ jobs:
         with:
           neovim: true
           version: ${{ matrix.nvim_version }}
+      - name: Install luarocks
+        run: sudo apt-get update && sudo apt-get install -y luarocks
       - name: Run tests
         run: nvim -l tests/minit.lua --minitest
