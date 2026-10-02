@@ -271,7 +271,6 @@ LINTING & FORMATTING ~
   make lint                    # Style check with StyLua
   make format                  # Auto-format with StyLua
   make check                   # Run all: lint + typecheck + test
-  make rockspec-check          # Verify packaged modules and runtime files
 <
 
  vim:tw=78:ts=8:ft=help:norl:
