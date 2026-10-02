@@ -1,4 +1,4 @@
-.PHONY: test test-one lint format typecheck check dev
+.PHONY: test test-one lint format typecheck check
 
 test:
 	nvim -l tests/minit.lua --minitest $(FILE)
@@ -19,6 +19,3 @@ typecheck:
 	VIM="$(NVIM_VIMRUNTIME)/.." lua-language-server --check_format=pretty --check lua/ --checklevel=Warning --configpath="$$(pwd)/.luarc.json"
 
 check: lint typecheck test
-
-dev:
-	nvim -u repro/repro.lua
