@@ -20,6 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: nightly
+      - name: Expose Neovim runtime types
+        run: echo "VIM=$(nvim --headless -c 'lua io.write(vim.env.VIMRUNTIME)' -c q)/.." >> "$GITHUB_ENV"
       - uses: mrcjkb/lua-typecheck-action@v1.1.0
         with:
           directories: lua/
