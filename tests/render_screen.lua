@@ -267,13 +267,17 @@ elseif scenario == "windows" then
     return screen_text(first_win, 1, 28):match("```lua") ~= nil
   end, "first window did not reveal fence source")
   assert(screen_text(first_win, 1, 28):match("```lua"))
-  equal("label", screen_text(first_win, 4, 5))
+  wait_for_screen(function()
+    return screen_text(first_win, 4, 5) == "label"
+  end, "first window did not conceal link source")
 
   vim.api.nvim_set_current_win(second_win)
   wait_for_screen(function()
     return screen_text(second_win, 4, 28):match("%[label%]") ~= nil
   end, "second window did not reveal link source")
-  equal("     ", screen_text(second_win, 1, 5))
+  wait_for_screen(function()
+    return screen_text(second_win, 1, 5) == "     "
+  end, "second window did not conceal fence source")
   assert(screen_text(second_win, 4, 28):match("%[label%]"))
 else
   error("unknown screen scenario: " .. scenario)
