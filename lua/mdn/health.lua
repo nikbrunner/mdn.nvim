@@ -14,10 +14,10 @@ function M.check()
 
   vim.health.ok("plugin is loaded")
 
-  if vim.fn.has("nvim-0.10") == 1 then
-    vim.health.ok("Neovim >= 0.10")
+  if vim.fn.has("nvim-0.13") == 1 then
+    vim.health.ok("Neovim >= 0.13")
   else
-    vim.health.error("Neovim >= 0.10 is required")
+    vim.health.error("Neovim >= 0.13 is required")
   end
 
   local Config = require("mdn.config")

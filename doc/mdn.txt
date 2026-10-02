@@ -70,7 +70,7 @@ For insert-mode line indent/outdent, use Neovim's built-in |i_CTRL-T| and
 ==============================================================================
 3. REQUIREMENTS                                        *mdn-requirements*
 
-- Neovim ≥ 0.10
+- Neovim ≥ 0.13 (nightly)
 - Markdown filetype (set automatically by Neovim for .md files)
 
 ==============================================================================

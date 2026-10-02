@@ -20,7 +20,7 @@ Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 
 ## ⚡️ Requirements
 
-- [Neovim](https://github.com/neovim/neovim) ≥ 0.10
+- [Neovim](https://github.com/neovim/neovim) ≥ 0.13 (nightly)
 
 ## 📦 Installation
 
