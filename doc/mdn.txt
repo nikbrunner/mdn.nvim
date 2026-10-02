@@ -50,6 +50,8 @@ things you miss most when editing Markdown in Neovim.
   - Valid links display as labels without a reserved trailing cell
   - Code-fence delimiters and language markers are concealed character-wise
   - Fence rows and all code payload remain visible while editing
+  - Table pipes display as box-drawing lines and the header delimiter row
+    as a heavy rule; cell contents stay unconcealed so columns stay aligned
   - The cursor reveals source independently in each window
   - Missing Markdown parser or query support leaves readable source
 

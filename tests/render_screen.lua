@@ -58,6 +58,31 @@ if scenario == "link" then
   equal("payload", screen_text(win, 4, 7))
   equal("       ", screen_text(win, 5, 7))
   equal("after", screen_text(win, 6, 5))
+elseif scenario == "table" then
+  local win = vim.api.nvim_get_current_win()
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+    "before",
+    "| `a` | [ ] |",
+    "| --- | :-: |",
+    "| **b** | x \\| y |",
+    "",
+    "`c` after",
+  })
+  vim.api.nvim_win_set_cursor(win, { 1, 0 })
+  Render.render(buf)
+  vim.treesitter.start(buf, "markdown")
+  wait_for_screen(function()
+    return screen_text(win, 6, 7) == "c after"
+  end, "inline conceal never rendered outside the table")
+
+  equal("│ `a` │ [ ] │", screen_text(win, 2, 13))
+  equal("┝━━━━━┿━━━━━┥", screen_text(win, 3, 13))
+  equal("│ **b** │ x \\| y │", screen_text(win, 4, 18))
+
+  vim.api.nvim_win_set_cursor(win, { 3, 0 })
+  wait_for_screen(function()
+    return screen_text(win, 3, 13) == "| --- | :-: |"
+  end, "cursor row never revealed delimiter source")
 elseif scenario == "insert" then
   local win = vim.api.nvim_get_current_win()
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "```lua", "payload", "```", "after" })

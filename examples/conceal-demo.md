@@ -27,10 +27,10 @@ the same layout. Start Insert mode on a cell to reveal its source for editing.
 :setlocal concealcursor=n
 ```
 
-| Status | Score | Detail |
-| ------ | ----- | ------ |
-| Passing | **100%** | [updated](https://example.com) |
-| Pending | **67%** | [previous](https://example.com) |
+| Status  | Score    | Detail                          |
+| ------- | -------- | ------------------------------- |
+| Passing | **100%** | [updated](https://example.com)  |
+| Pending | **67%**  | [previous](https://example.com) |
 
 Malformed source should stay readable rather than swallowing nearby text:
 

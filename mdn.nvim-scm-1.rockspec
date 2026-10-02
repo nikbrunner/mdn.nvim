@@ -30,5 +30,5 @@ build = {
     ["mdn.render"] = "lua/mdn/render.lua",
     ["mdn.link"] = "lua/mdn/link.lua",
   },
-  copy_directories = { "after", "plugin", "doc" },
+  copy_directories = { "after", "plugin", "doc", "queries" },
 }

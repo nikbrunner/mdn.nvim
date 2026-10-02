@@ -378,6 +378,10 @@ describe("hybrid Markdown rendering", function()
     run_screen_scenario("link")
   end)
 
+  it("keeps table source unconcealed while inline conceal works elsewhere", function()
+    run_screen_scenario("table")
+  end)
+
   it("reveals checkbox source across Visual Block selections", function()
     run_screen_scenario("conceal")
   end)

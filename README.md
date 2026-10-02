@@ -13,7 +13,7 @@ Most Markdown plugins do too much. mdn.nvim does exactly a few things:
 1. **Smart list continuation** — press Enter and the next list item appears automatically
 2. **Bullet/checkbox cycle** — `<C-k>` cycles: blank → bullet → [ ] → [~] → [x] → bullet
 3. **Concealed list markers** — shows padded symbols for list items and checkbox states; keeps the current line editable
-4. **Stable Markdown rendering** — shows links as labels and hides fence markers without collapsing source rows or payload
+4. **Stable Markdown rendering** — shows links as labels and hides fence markers without collapsing source rows or payload; tables draw box lines and keep cell text unconcealed so columns line up
 5. **Yank link** — `yl` copies the whole Markdown link, or just the URL of a bare link
 
 Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.

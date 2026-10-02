@@ -10,6 +10,14 @@ local fence_query_text = [[
 (fenced_code_block
   (info_string
     (language) @conceal))
+
+(pipe_table_header
+  "|" @table.pipe)
+
+(pipe_table_row
+  "|" @table.pipe)
+
+(pipe_table_delimiter_row) @table.delimiter
 ]]
 
 ---@type vim.treesitter.Query?
@@ -83,6 +91,27 @@ local function prepare_highlight_query()
   return true
 end
 
+local function set_conceal(buf, row, start_col, end_col, char)
+  vim.api.nvim_buf_set_extmark(buf, Config.render_ns, row, start_col, {
+    end_col = end_col,
+    conceal = char,
+    priority = 200,
+  })
+end
+
+local function render_delimiter_row(buf, row)
+  local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1]
+  local first, last = line:find("%S"), line:find("%S%s*$")
+  for col = first, last do
+    local char = line:sub(col, col)
+    local symbol = "━"
+    if char == "|" then
+      symbol = col == first and "┝" or col == last and "┥" or "┿"
+    end
+    set_conceal(buf, row, col - 1, col, symbol)
+  end
+end
+
 ---Apply configured rendering options to every window displaying a buffer.
 ---@param buf integer Buffer id
 function M.apply_windows(buf)
@@ -121,14 +150,21 @@ function M.render(buf)
   end
 
   local ok = pcall(function()
-    for _, node in query:iter_captures(trees[1]:root(), buf, 0, -1) do
+    for id, node in query:iter_captures(trees[1]:root(), buf, 0, -1) do
+      local capture = query.captures[id]
       local start_row, start_col, end_row, end_col = node:range()
-      vim.api.nvim_buf_set_extmark(buf, Config.render_ns, start_row, start_col, {
-        end_row = end_row,
-        end_col = end_col,
-        conceal = "",
-        priority = 200,
-      })
+      if capture == "table.pipe" then
+        set_conceal(buf, start_row, start_col, start_col + 1, "│")
+      elseif capture == "table.delimiter" then
+        render_delimiter_row(buf, start_row)
+      else
+        vim.api.nvim_buf_set_extmark(buf, Config.render_ns, start_row, start_col, {
+          end_row = end_row,
+          end_col = end_col,
+          conceal = "",
+          priority = 200,
+        })
+      end
     end
   end)
   if not ok then
