@@ -11,6 +11,7 @@ local M = {}
 
 ---@class Mdn.MappingsOptions
 ---@field cycle_key string Key for four-state cycle: blank → bullet → checkbox → toggle (set to "" to disable)
+---@field yank_link_key string Key that yanks the link under the cursor (set to "" to disable)
 
 ---@class Mdn.RenderingOptions
 ---@field conceallevel integer Markdown window conceal level (default: 2)
@@ -37,6 +38,7 @@ local defaults = {
   },
   mappings = {
     cycle_key = "<C-k>",
+    yank_link_key = "yl",
   },
   rendering = {
     conceallevel = 2,
@@ -78,6 +80,7 @@ function M.setup(opts)
   vim.validate({
     auto_continue = { config.lists.auto_continue, "boolean" },
     cycle_key = { config.mappings.cycle_key, "string", true },
+    yank_link_key = { config.mappings.yank_link_key, "string" },
     bullet_marker = { config.lists.bullet_marker, "string", true },
     ["rendering.conceallevel"] = { config.rendering.conceallevel, "number" },
     ["rendering.concealcursor"] = { config.rendering.concealcursor, "string" },

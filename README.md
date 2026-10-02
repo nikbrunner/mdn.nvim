@@ -14,6 +14,7 @@ Most Markdown plugins do too much. mdn.nvim does exactly a few things:
 2. **Bullet/checkbox cycle** — `<C-k>` cycles: blank → bullet → [ ] → [~] → [x] → bullet
 3. **Concealed list markers** — shows padded symbols for list items and checkbox states; keeps the current line editable
 4. **Stable Markdown rendering** — shows links as labels and hides fence markers without collapsing source rows or payload
+5. **Yank link** — `yl` copies the whole Markdown link, or just the URL of a bare link
 
 Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 
@@ -64,6 +65,16 @@ over Neovim's Insert-mode digraph entry in Markdown buffers.
 > For indenting/outdenting list items in Insert mode, use Neovim's built-in
 > `<C-t>` / `<C-d>` (see `:h i_CTRL-T`).
 
+### Yank Link (`yl`)
+
+| Cursor on                         | Yanked                        |
+| --------------------------------- | ----------------------------- |
+| `[docs](https://example.com)`     | `[docs](https://example.com)` |
+| `https://example.com.` (bare URL) | `https://example.com`         |
+| anything else                     | native `yl`                   |
+
+Yanks into `v:register`, so `"+yl` and `clipboard=unnamedplus` work as usual.
+
 ### Commands
 
 | Command       | Action                                                        |
@@ -80,6 +91,7 @@ vim.g.mdn_config = {
     },
     mappings = {
       cycle_key = "<C-k>",       -- bullet/checkbox cycle key (set to "" to disable)
+      yank_link_key = "yl",      -- yank link under cursor (set to "" to disable)
     },
     rendering = {
       conceallevel = 2,          -- Markdown window conceal level (0 through 3)

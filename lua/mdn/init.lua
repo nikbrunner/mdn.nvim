@@ -20,6 +20,11 @@ function M.toggle_checkbox()
   require("mdn.checkbox").toggle()
 end
 
+---Yank the link under the cursor: the full Markdown link, or the bare URL.
+function M.yank_link()
+  require("mdn.link").yank()
+end
+
 ---Continue the current list by inserting a new list item below.
 function M.continue_list()
   require("mdn.list").continue("o")

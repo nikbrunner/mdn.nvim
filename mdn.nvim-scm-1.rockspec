@@ -28,6 +28,7 @@ build = {
     ["mdn.checkbox"] = "lua/mdn/checkbox.lua",
     ["mdn.health"] = "lua/mdn/health.lua",
     ["mdn.render"] = "lua/mdn/render.lua",
+    ["mdn.link"] = "lua/mdn/link.lua",
   },
   copy_directories = { "after", "plugin", "doc" },
 }

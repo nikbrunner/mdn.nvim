@@ -41,6 +41,11 @@ things you miss most when editing Markdown in Neovim.
     chars → [x]
   - Same key works in both Normal and Insert mode
 
+- Yank link under cursor on yl
+  - Markdown link: yanks the whole link, e.g. [label](url)
+  - Bare URL: yanks only the URL, without trailing punctuation
+  - Anywhere else: behaves like the native |yl|
+
 - Stable Markdown rendering
   - Valid links display as labels without a reserved trailing cell
   - Code-fence delimiters and language markers are concealed character-wise
@@ -100,6 +105,7 @@ DEFAULT CONFIGURATION ~
     },
     mappings = {
       cycle_key = "<C-k>",
+      yank_link_key = "yl",
     },
     rendering = {
       conceallevel = 2,
@@ -133,6 +139,10 @@ OPTIONS ~
     Key for the bullet/checkbox cycle in Normal, Insert, and Visual
     mode. Set to "" to disable. The default Insert-mode mapping takes
     precedence over Neovim's |i_CTRL-K| digraph entry.
+
+  mappings.yank_link_key (string, default: "yl")
+    Normal-mode key that yanks the link under the cursor into
+    |v:register|. Set to "" to disable.
 
   rendering.conceallevel (integer, default: 2)
     Window-local Markdown conceal level. Accepted values are 0 through 3.
@@ -207,6 +217,12 @@ CHECKBOX CYCLE ~
   <C-k>  (Visual)           Toggle checkboxes across selected lines
 <
 
+YANK LINK ~
+>
+  yl  (Normal mode)  Yank the Markdown link or bare URL under the
+                     cursor; native yl elsewhere
+<
+
 ==============================================================================
 8. API                                                          *mdn-api*
 
@@ -221,6 +237,11 @@ mdn.cycle() ~
 mdn.toggle_checkbox() ~
     Toggle the checkbox on the current line (or add one). Same as
     `:Mdn toggle`. Does not create bullet points.
+
+                                                              *mdn.yank_link()*
+mdn.yank_link() ~
+    Yank the link under the cursor into |v:register|: the whole Markdown
+    link, or only the URL of a bare link. Falls back to |yl| elsewhere.
 
                                                            *mdn.continue_list()*
 mdn.continue_list() ~

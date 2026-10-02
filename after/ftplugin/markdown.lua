@@ -55,3 +55,13 @@ if Config.mappings.cycle_key ~= "" then
     desc = "Mdn: Toggle checkboxes in selection",
   })
 end
+
+-- Yank link under cursor: full Markdown link, or bare URL
+if Config.mappings.yank_link_key ~= "" then
+  vim.keymap.set("n", Config.mappings.yank_link_key, function()
+    require("mdn.link").yank()
+  end, {
+    buffer = buf,
+    desc = "Mdn: Yank link under cursor",
+  })
+end
