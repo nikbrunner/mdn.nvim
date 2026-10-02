@@ -76,15 +76,12 @@ setmetatable(M, {
 function M.setup(opts)
   config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), opts or {})
 
-  -- Use the table form for Neovim 0.10 compatibility.
-  vim.validate({
-    auto_continue = { config.lists.auto_continue, "boolean" },
-    cycle_key = { config.mappings.cycle_key, "string", true },
-    yank_link_key = { config.mappings.yank_link_key, "string" },
-    bullet_marker = { config.lists.bullet_marker, "string", true },
-    ["rendering.conceallevel"] = { config.rendering.conceallevel, "number" },
-    ["rendering.concealcursor"] = { config.rendering.concealcursor, "string" },
-  })
+  vim.validate("auto_continue", config.lists.auto_continue, "boolean")
+  vim.validate("cycle_key", config.mappings.cycle_key, "string", true)
+  vim.validate("yank_link_key", config.mappings.yank_link_key, "string")
+  vim.validate("bullet_marker", config.lists.bullet_marker, "string", true)
+  vim.validate("rendering.conceallevel", config.rendering.conceallevel, "number")
+  vim.validate("rendering.concealcursor", config.rendering.concealcursor, "string")
   if
     config.rendering.conceallevel % 1 ~= 0
     or config.rendering.conceallevel < 0
@@ -100,11 +97,9 @@ function M.setup(opts)
     seen_modes[mode] = true
   end
   for name, rule in pairs(config.conceal) do
-    vim.validate({
-      ["conceal." .. name] = { rule, "table" },
-      ["conceal." .. name .. ".pattern"] = { rule.pattern, "string" },
-      ["conceal." .. name .. ".replace"] = { rule.replace, "string" },
-    })
+    vim.validate("conceal." .. name, rule, "table")
+    vim.validate("conceal." .. name .. ".pattern", rule.pattern, "string")
+    vim.validate("conceal." .. name .. ".replace", rule.replace, "string")
   end
 end
 

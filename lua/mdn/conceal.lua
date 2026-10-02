@@ -52,7 +52,7 @@ end
 ---Render list markers and supported checkbox states in a buffer.
 ---@param buf integer Buffer id
 function M.render(buf)
-  vim.validate({ buf = { buf, "number" } })
+  vim.validate("buf", buf, "number")
   if buf == 0 then
     buf = vim.api.nvim_get_current_buf()
   end

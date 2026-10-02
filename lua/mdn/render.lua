@@ -128,7 +128,7 @@ end
 ---Render fenced-code delimiters and language markers in a Markdown buffer.
 ---@param buf integer Buffer id
 function M.render(buf)
-  vim.validate({ buf = { buf, "number" } })
+  vim.validate("buf", buf, "number")
   if not vim.api.nvim_buf_is_valid(buf) then
     return
   end
