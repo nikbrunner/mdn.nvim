@@ -4,6 +4,53 @@ local Config = require("mdn.config")
 local List = require("mdn.list")
 local M = {}
 
+---Advance one line one step through the cycle.
+---@param line string
+---@param cursor_col integer 1-indexed cursor column on the line
+---@return string new_line
+---@return integer new_col
+local function cycle_line(line, cursor_col)
+  local marker = Config.lists.bullet_marker .. " "
+
+  -- State 1: Blank or non-list line → create bullet point
+  local lcontent = List.resolve_list_content(line)
+  if not lcontent then
+    if line:match("^%s*$") then
+      return marker, #marker + 1
+    end
+    return marker .. line, #marker + 1
+  end
+
+  local task_state = List.get_task_state(lcontent.text)
+
+  if task_state then
+    -- State 3: Cycle through checkbox states
+    -- [ ] → [~] → [x] → plain bullet (continuous cycle)
+    -- Other checkbox chars → [x] (complete to done)
+    local cb_char = lcontent.text:match("^%[(.)%]")
+    if cb_char == " " then
+      return (line:gsub("%[ %]", "[~]", 1)), cursor_col
+    elseif cb_char == "~" then
+      return (line:gsub("%[~%]", "[x]", 1)), cursor_col
+    elseif cb_char == "x" or cb_char == "X" then
+      local checkbox = line:match("%[[xX]%]%s*")
+      local new_line = line:gsub("%[[xX]%]%s*", "", 1)
+      local content_start_col = #lcontent.indent + #lcontent.marker + #lcontent.separator + 2
+      if cursor_col >= content_start_col then
+        cursor_col = math.max(content_start_col, cursor_col - #checkbox)
+      end
+      return new_line, cursor_col
+    end
+    return (line:gsub("%[(.)%]", "[x]", 1)), cursor_col
+  end
+
+  -- State 2: Bullet exists, no checkbox → add [ ] after marker
+  local marker_with_sep = lcontent.marker .. lcontent.separator
+  local escaped_marker = marker_with_sep:gsub("%p", "%%%1")
+  local new_line = line:gsub(escaped_marker .. "%s*", marker_with_sep .. " [ ] ", 1)
+  return new_line, cursor_col + 4
+end
+
 ---Cycle: blank → bullet → unchecked → in-progress → done → bullet → ...
 ---
 ---State 1: Blank or non-list line → insert bullet marker
@@ -18,62 +65,22 @@ local M = {}
 ---Works in both Normal and Insert mode.
 function M.cycle()
   local lnum = vim.fn.line(".")
-  local line = vim.api.nvim_get_current_line()
-  local marker = Config.lists.bullet_marker .. " "
+  local new_line, new_col = cycle_line(vim.api.nvim_get_current_line(), vim.fn.col("."))
+  vim.api.nvim_set_current_line(new_line)
+  vim.fn.cursor(lnum, new_col)
+end
 
-  -- State 1: Blank or non-list line → create bullet point
-  local lcontent = List.resolve_list_content(line)
-  if not lcontent then
-    if line:match("^%s*$") then
-      -- Blank line: replace with marker
-      vim.api.nvim_set_current_line(marker)
-    else
-      -- Non-blank non-list: prepend marker to turn it into a bullet
-      vim.api.nvim_set_current_line(marker .. line)
-    end
-    vim.fn.cursor(lnum, #marker + 1)
-    return
+---Cycle every line in a range one step, each by its own state.
+---Indentation is left as is.
+---@param line1 integer 1-indexed start line
+---@param line2 integer 1-indexed end line
+function M.cycle_range(line1, line2)
+  local buf = vim.api.nvim_get_current_buf()
+  local lines = vim.api.nvim_buf_get_lines(buf, line1 - 1, line2, false)
+  for i, line in ipairs(lines) do
+    lines[i] = cycle_line(line, 1)
   end
-
-  local task_state = List.get_task_state(lcontent.text)
-  local cursor_col = vim.fn.col(".")
-
-  if task_state then
-    -- State 3: Cycle through checkbox states
-    -- [ ] → [~] → [x] → plain bullet (continuous cycle)
-    -- Other checkbox chars → [x] (complete to done)
-    local cb_char = lcontent.text:match("^%[(.)%]")
-    if cb_char == " " then
-      -- [ ] → [~] (unchecked → in progress)
-      local new_line = line:gsub("%[ %]", "[~]", 1)
-      vim.api.nvim_set_current_line(new_line)
-    elseif cb_char == "~" then
-      -- [~] → [x] (in progress → done)
-      local new_line = line:gsub("%[~%]", "[x]", 1)
-      vim.api.nvim_set_current_line(new_line)
-    elseif cb_char == "x" or cb_char == "X" then
-      -- [x] → plain bullet (done → restart cycle)
-      local checkbox = line:match("%[[xX]%]%s*")
-      local new_line = line:gsub("%[[xX]%]%s*", "", 1)
-      vim.api.nvim_set_current_line(new_line)
-      local content_start_col = #lcontent.indent + #lcontent.marker + #lcontent.separator + 2
-      if cursor_col >= content_start_col then
-        cursor_col = math.max(content_start_col, cursor_col - #checkbox)
-      end
-    else
-      -- Other checkbox chars → [x] (complete to done)
-      local new_line = line:gsub("%[(.)%]", "[x]", 1)
-      vim.api.nvim_set_current_line(new_line)
-    end
-    vim.fn.cursor(lnum, cursor_col)
-  else
-    -- State 2: Bullet exists, no checkbox → add [ ] after marker
-    local marker_with_sep = lcontent.marker .. lcontent.separator
-    local escaped_marker = marker_with_sep:gsub("%p", "%%%1")
-    local new_line = line:gsub(escaped_marker .. "%s*", marker_with_sep .. " [ ] ", 1)
-    vim.api.nvim_set_current_line(new_line)
-    vim.fn.cursor(lnum, cursor_col + 4)
-  end
+  vim.api.nvim_buf_set_lines(buf, line1 - 1, line2, false, lines)
 end
 
 ---Set a line's checkbox to the given target state.

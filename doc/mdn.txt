@@ -216,7 +216,7 @@ CHECKBOX CYCLE ~
 >
   <C-k>  (Normal + Insert)  Bullet/checkbox cycle:
     blank → bullet → [ ] → [~] → [x] → bullet
-  <C-k>  (Visual)           Toggle checkboxes across selected lines
+  <C-k>  (Visual)           Cycle each selected line, keeping the selection
 <
 
 YANK LINK ~

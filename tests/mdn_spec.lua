@@ -909,3 +909,44 @@ describe("list continuation", function()
     end)
   end)
 end)
+
+describe("range cycle", function()
+  local buf
+
+  before_each(function()
+    buf = vim.api.nvim_create_buf(true, false)
+    vim.api.nvim_set_current_buf(buf)
+  end)
+
+  after_each(function()
+    if buf and vim.api.nvim_buf_is_valid(buf) then
+      pcall(vim.api.nvim_buf_delete, buf, { force = true })
+    end
+  end)
+
+  it("advances each line by its own state and keeps indentation", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+      "- [x] done",
+      "- [ ] todo",
+      "- [~] doing",
+      "  - child",
+      "  - [x] nested done",
+      "plain",
+    })
+    Checkbox.cycle_range(1, 6)
+    assert.are.same({
+      "- done",
+      "- [~] todo",
+      "- [x] doing",
+      "  - [ ] child",
+      "  - nested done",
+      "- plain",
+    }, vim.api.nvim_buf_get_lines(buf, 0, -1, false))
+  end)
+
+  it("matches single-line cycle on a one-line range", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [ ] a" })
+    Checkbox.cycle_range(1, 1)
+    assert.are.equal("- [~] a", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
+  end)
+end)

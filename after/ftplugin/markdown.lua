@@ -48,11 +48,10 @@ if Config.mappings.cycle_key ~= "" then
     if line1 > line2 then
       line1, line2 = line2, line1
     end
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
-    require("mdn.checkbox").toggle_range(line1, line2)
+    require("mdn.checkbox").cycle_range(line1, line2)
   end, {
     buffer = buf,
-    desc = "Mdn: Toggle checkboxes in selection",
+    desc = "Mdn: Cycle bullets/checkboxes in selection",
   })
 end
 

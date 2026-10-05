@@ -58,6 +58,9 @@ vim.pack.add({ "https://github.com/nikbrunner/mdn.nvim" }, { load = true })
 | 4    | `- [~] buy milk` | `- [x] buy milk`                     |
 | 5    | `- [x] buy milk` | `- buy milk`                         |
 
+In Visual mode, every selected line advances one step by its own state;
+indentation is untouched.
+
 Works in both Normal and Insert mode. The default `<C-k>` mapping takes precedence
 over Neovim's Insert-mode digraph entry in Markdown buffers.
 
