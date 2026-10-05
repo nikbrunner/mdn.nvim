@@ -162,6 +162,34 @@ describe("conceal rendering", function()
     _G.mdn_visual_block_marks = nil
   end)
 
+  it("hides virtual signs on every line in a linewise selection", function()
+    vim.bo[buf].filetype = "markdown"
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+      "- [ ] first",
+      "- [x] second",
+      "- [ ] third",
+      "- [x] fourth",
+    })
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+
+    _G.mdn_capture_linewise = function()
+      Conceal.render(buf)
+      _G.mdn_linewise_marks = vim.api.nvim_buf_get_extmarks(buf, Config.conceal_ns, 0, -1, {})
+    end
+    vim.api.nvim_feedkeys(
+      vim.api.nvim_replace_termcodes("Vj<Cmd>lua _G.mdn_capture_linewise()<CR>", true, false, true),
+      "x",
+      false
+    )
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", false)
+
+    assert.are.equal(2, #_G.mdn_linewise_marks)
+    assert.are.equal(2, _G.mdn_linewise_marks[1][2])
+    assert.are.equal(3, _G.mdn_linewise_marks[2][2])
+    _G.mdn_capture_linewise = nil
+    _G.mdn_linewise_marks = nil
+  end)
+
   it("hides virtual signs on the cursor line", function()
     vim.bo[buf].filetype = "markdown"
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, {

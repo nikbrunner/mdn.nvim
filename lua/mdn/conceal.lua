@@ -28,11 +28,11 @@ local function add_mark(buf, row, start_col, end_col, symbol)
   vim.api.nvim_buf_set_extmark(buf, Config.conceal_ns, row, start_col, opts)
 end
 
-local function get_visual_block_range(buf)
+local function get_visual_range(buf)
   if
     vim.api.nvim_get_current_buf() ~= buf
     or vim.wo.concealcursor:find("v", 1, true)
-    or vim.fn.mode(1):sub(1, 1) ~= "\22"
+    or not vim.fn.mode(1):sub(1, 1):match("^[vV\22]")
   then
     return
   end
@@ -67,7 +67,7 @@ function M.render(buf)
   if vim.api.nvim_get_current_buf() == buf then
     cursor_row = vim.api.nvim_win_get_cursor(0)[1] - 1
   end
-  local visual_start, visual_end = get_visual_block_range(buf)
+  local visual_start, visual_end = get_visual_range(buf)
 
   for row, line in ipairs(lines) do
     local row_index = row - 1
