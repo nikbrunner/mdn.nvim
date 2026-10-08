@@ -35,11 +35,30 @@ end
 -- Bullet/checkbox cycle: blank → bullet → [ ] → [~] → [x] → bullet
 -- Same key in both Normal and Insert mode
 if Config.mappings.cycle_key ~= "" then
-  vim.keymap.set({ "n", "i" }, Config.mappings.cycle_key, function()
-    require("mdn.checkbox").cycle()
-  end, {
+  local function set_cycle(modes)
+    vim.keymap.set(modes, Config.mappings.cycle_key, function()
+      require("mdn.checkbox").cycle()
+    end, {
+      buffer = buf,
+      desc = "Mdn: Cycle bullet/checkbox",
+    })
+  end
+
+  set_cycle({ "n", "i" })
+
+  -- Completion plugins (e.g. blink.cmp) set buffer-local Insert maps on
+  -- InsertEnter, replacing ours. Re-apply once they're done.
+  vim.api.nvim_clear_autocmds({ group = Config.augroup, event = "InsertEnter", buffer = buf })
+  vim.api.nvim_create_autocmd("InsertEnter", {
+    group = Config.augroup,
     buffer = buf,
-    desc = "Mdn: Cycle bullet/checkbox",
+    callback = function()
+      vim.schedule(function()
+        if vim.api.nvim_buf_is_valid(buf) then
+          set_cycle("i")
+        end
+      end)
+    end,
   })
 
   vim.keymap.set("v", Config.mappings.cycle_key, function()

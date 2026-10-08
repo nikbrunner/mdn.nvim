@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Checkboxes — nbr <nikolaus.brunner@protonmail.ch>
+  - The Insert-mode `mappings.cycle_key` stays in place after completion plugins such as blink.cmp set their own buffer maps on `InsertEnter`.
+
 ---
 
 ## [1.0.0](https://github.com/nikbrunner/mdn.nvim/compare/v0.0.1...v1.0.0) (2026-10-02)
