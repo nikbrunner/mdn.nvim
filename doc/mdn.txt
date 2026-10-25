@@ -31,6 +31,23 @@ things you miss most when editing Markdown in Neovim.
   - Task lists (- [ ]) continue with empty checkboxes
   - Empty list items terminate continuation
   - Works with indented/nested lists
+  - Lines inside code blocks are left alone
+
+- Ordered list renumbering
+  - After every edit in Normal and Insert mode, ordered lists number
+    their items from 1
+  - Each nested list counts on its own
+  - Nested content shifts with its marker when the number changes width
+  - One |u| undoes the edit together with the renumbering
+
+- Table fit
+  - After leaving Insert mode and after Normal-mode edits, cells are
+    padded so the columns line up in the source
+  - Widths are measured on screen, so umlauts, icons, and wide
+    characters line up
+  - Alignment colons in the delimiter row are kept
+  - Short rows get empty cells; extra cells and escaped pipes are kept
+  - One |u| undoes the edit together with the fit
 
 - Bullet/checkbox cycle on <C-k>
   - 1. Blank/non-list line → creates bullet (uses configured bullet_marker)
@@ -107,6 +124,10 @@ DEFAULT CONFIGURATION ~
     lists = {
       auto_continue = true,
       bullet_marker = "-",
+      auto_renumber = true,
+    },
+    tables = {
+      auto_fit = true,
     },
     mappings = {
       cycle_key = "<C-k>",
@@ -139,6 +160,14 @@ OPTIONS ~
     List marker character used when the cycle key creates a new
     bullet from a blank or non-list line. Accepted values: "-",
     "*", "+".
+
+  lists.auto_renumber    (boolean, default: true)
+    Renumber ordered lists from 1 after every edit. Set to false to
+    keep list numbers as typed.
+
+  tables.auto_fit        (boolean, default: true)
+    Pad table cells so columns line up in the source after leaving
+    Insert mode and after Normal-mode edits. Set to false to disable.
 
   mappings.cycle_key     (string, default: "<C-k>")
     Key for the bullet/checkbox cycle in Normal, Insert, and Visual

@@ -7,6 +7,7 @@ local Config = require("mdn.config")
 Config.setup(vim.g.mdn_config)
 require("mdn.conceal").setup()
 require("mdn.render").setup()
+require("mdn.autofix").setup()
 
 ---Bullet/checkbox cycle: blank → bullet → [ ] → [~] → [x] → bullet.
 ---Works in both Normal and Insert mode.

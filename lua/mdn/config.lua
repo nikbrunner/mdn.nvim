@@ -1,5 +1,6 @@
 ---@class Mdn.Config
 ---@field lists? Mdn.ListsOptions
+---@field tables? Mdn.TablesOptions
 ---@field mappings? Mdn.MappingsOptions
 ---@field conceal? Mdn.ConcealOptions
 ---@field rendering? Mdn.RenderingOptions
@@ -8,6 +9,10 @@ local M = {}
 ---@class Mdn.ListsOptions
 ---@field auto_continue boolean Automatically continue lists on <CR>/o/O (default: true)
 ---@field bullet_marker string List marker for new bullets (default: "-")
+---@field auto_renumber boolean Renumber ordered lists after every edit
+
+---@class Mdn.TablesOptions
+---@field auto_fit boolean Pad table cells so columns line up in the source
 
 ---@class Mdn.MappingsOptions
 ---@field cycle_key string Key for four-state cycle: blank → bullet → checkbox → toggle (set to "" to disable)
@@ -35,6 +40,10 @@ local defaults = {
   lists = {
     auto_continue = true,
     bullet_marker = "-",
+    auto_renumber = true,
+  },
+  tables = {
+    auto_fit = true,
   },
   mappings = {
     cycle_key = "<C-k>",
@@ -80,6 +89,8 @@ function M.setup(opts)
   vim.validate("cycle_key", config.mappings.cycle_key, "string", true)
   vim.validate("yank_link_key", config.mappings.yank_link_key, "string")
   vim.validate("bullet_marker", config.lists.bullet_marker, "string", true)
+  vim.validate("auto_renumber", config.lists.auto_renumber, "boolean")
+  vim.validate("tables.auto_fit", config.tables.auto_fit, "boolean")
   vim.validate("rendering.conceallevel", config.rendering.conceallevel, "number")
   vim.validate("rendering.concealcursor", config.rendering.concealcursor, "string")
   if

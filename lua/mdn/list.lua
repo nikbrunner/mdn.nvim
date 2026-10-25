@@ -260,4 +260,107 @@ function M.continue(key)
   end
 end
 
+local ordered_markers = {
+  list_marker_dot = true,
+  list_marker_parenthesis = true,
+}
+
+---Shift the continuation rows of a list item by `delta` columns at `col`,
+---so nested content stays nested when its marker changes width.
+---@param buf integer
+---@param first_row integer 0-indexed first continuation row
+---@param last_row integer 0-indexed last continuation row
+---@param col integer 0-indexed column where the item's marker starts
+---@param width integer Width of the marker before the change
+---@param delta integer Columns to add (positive) or remove (negative)
+local function shift_continuation(buf, first_row, last_row, col, width, delta)
+  for row = first_row, last_row do
+    local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1]
+    if line:sub(col + 1, col + width):match("^ +$") then
+      if delta > 0 then
+        vim.api.nvim_buf_set_text(buf, row, col, row, col, { (" "):rep(delta) })
+      elseif line:sub(col + 1, col - delta):match("^ +$") then
+        vim.api.nvim_buf_set_text(buf, row, col, row, col - delta, { "" })
+      end
+    end
+  end
+end
+
+---Number the items of one ordered list from 1.
+---@param buf integer
+---@param list TSNode A `list` node
+---@return boolean changed
+local function renumber_list(buf, list)
+  local number = 0
+  local changed = false
+  for item in list:iter_children() do
+    local marker = item:type() == "list_item" and item:named_child(0)
+    if marker then
+      if not ordered_markers[marker:type()] then
+        return changed
+      end
+      number = number + 1
+      local row, col, _, marker_end = marker:range()
+      local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1]
+      local digits = line:sub(col + 1, marker_end):match("^%d+")
+      local wanted = tostring(number)
+      if digits and digits ~= wanted then
+        vim.api.nvim_buf_set_text(buf, row, col, row, col + #digits, { wanted })
+        changed = true
+        local delta = #wanted - #digits
+        if delta ~= 0 then
+          local _, _, end_row, end_col = item:range()
+          local last_row = end_col == 0 and end_row - 1 or end_row
+          shift_continuation(buf, row + 1, last_row, col, marker_end - col, delta)
+        end
+      end
+    end
+  end
+  return changed
+end
+
+---Find the `depth`-th enclosing `list` node of a row, innermost first.
+---@param root TSNode
+---@param buf integer
+---@param row integer 0-indexed row
+---@param depth integer
+---@return TSNode?
+local function enclosing_list(root, buf, row, depth)
+  local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
+  local col = math.max((line:find("%S") or 1) - 1, 0)
+  local node = root:named_descendant_for_range(row, col, row, col)
+  local found = 0
+  while node do
+    if node:type() == "list" then
+      found = found + 1
+      if found == depth then
+        return node
+      end
+    end
+    node = node:parent()
+  end
+end
+
+---Number every ordered list around a row from 1, innermost list first.
+---Unordered lists are left alone. Does nothing without a parser.
+---@param buf integer Buffer id
+---@param row integer 0-indexed row
+---@return boolean changed
+function M.renumber(buf, row)
+  if buf == 0 then
+    buf = vim.api.nvim_get_current_buf()
+  end
+  local changed = false
+  local depth = 1
+  while true do
+    local root = Syntax.tree(buf)
+    local list = root and enclosing_list(root, buf, row, depth)
+    if not list then
+      return changed
+    end
+    changed = renumber_list(buf, list) or changed
+    depth = depth + 1
+  end
+end
+
 return M

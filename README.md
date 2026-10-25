@@ -15,6 +15,8 @@ Most Markdown plugins do too much. mdn.nvim does exactly a few things:
 3. **Concealed list markers** — shows padded symbols for list items and checkbox states; keeps the current line editable
 4. **Stable Markdown rendering** — shows links as labels and hides fence markers without collapsing source rows or payload; tables draw box lines and keep cell text unconcealed so columns line up
 5. **Yank link** — `yl` copies the whole Markdown link, or just the URL of a bare link
+6. **Ordered list renumbering** — numbers fix themselves after you insert, delete, paste, or move items
+7. **Table fit** — cells get padded so columns line up in the source, not only in the rendered view
 
 Built from the [base.nvim](https://github.com/S1M0N38/base.nvim) template.
 
@@ -47,6 +49,36 @@ vim.pack.add({ "https://github.com/nikbrunner/mdn.nvim" }, { load = true })
 - Ordered lists (`1.`, `2)`, ...): auto-increments number
 - Task lists (`- [ ]`): continues with empty checkbox
 - Empty items (`- `): terminates (inserts blank line)
+- Lines inside code blocks are left alone
+
+### Ordered List Renumbering (auto_renumber = true)
+
+After every edit, in Normal and Insert mode, ordered lists number their items
+from 1. Nested lists count on their own, and nested content shifts with its
+marker when `9.` becomes `10.`. One `u` undoes the edit together with the
+renumbering.
+
+### Table Fit (auto_fit = true)
+
+When you leave Insert mode, or after a Normal-mode edit inside a table, mdn.nvim
+pads every cell so the columns line up in the source:
+
+```markdown
+| name | qty |
+|:-|-:|
+| Müller | 3 |
+```
+
+becomes
+
+```markdown
+| name   | qty |
+| :----- | --: |
+| Müller | 3   |
+```
+
+Widths are measured on screen, so umlauts and icons line up. Alignment colons
+are kept, short rows get empty cells, and no text is removed.
 
 ### Checkbox Cycle (`<C-k>`)
 
@@ -91,6 +123,10 @@ vim.g.mdn_config = {
     lists = {
         auto_continue = true,      -- enable/disable list continuation
         bullet_marker = "-",       -- marker for new bullets ("-", "*", "+")
+        auto_renumber = true,      -- renumber ordered lists after every edit
+    },
+    tables = {
+      auto_fit = true,           -- pad table cells so columns line up in the source
     },
     mappings = {
       cycle_key = "<C-k>",       -- bullet/checkbox cycle key (set to "" to disable)

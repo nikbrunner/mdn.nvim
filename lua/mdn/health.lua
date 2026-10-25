@@ -20,6 +20,15 @@ function M.check()
     vim.health.error("Neovim >= 0.13 is required")
   end
 
+  local scratch = vim.api.nvim_create_buf(false, true)
+  local parser_ok = require("mdn.syntax").available(scratch)
+  vim.api.nvim_buf_delete(scratch, { force = true })
+  if parser_ok then
+    vim.health.ok("markdown treesitter parser is available")
+  else
+    vim.health.error("markdown treesitter parser is unavailable — list renumbering and table fitting are off")
+  end
+
   local Config = require("mdn.config")
   if Config.lists.auto_continue then
     vim.health.ok("auto_continue is enabled")

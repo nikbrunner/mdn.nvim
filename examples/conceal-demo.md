@@ -47,6 +47,10 @@ symbols while every indentation level stays aligned.
   - Nested sibling
 - Top-level sibling
 
+1. Top-level item
+2. 3rd-level item
+3. 2nd-level item
+
 Move onto a list line. Its Markdown marker should reappear for editing. Press `o`
 or `O` to check that a new item keeps the current indentation and bullet style.
 

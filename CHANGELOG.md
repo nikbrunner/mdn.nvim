@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+### Added
+
+- Lists — nbr <nikolaus.brunner@protonmail.ch>
+  - Ordered lists renumber from 1 after every edit in Normal and Insert mode, each nested list counting on its own; `lists.auto_renumber` turns this off.
+- Tables — nbr <nikolaus.brunner@protonmail.ch>
+  - Table cells are padded to line up in the source after leaving Insert mode and after Normal-mode edits, measured by display width and keeping alignment colons; `tables.auto_fit` turns this off.
+- Health — nbr <nikolaus.brunner@protonmail.ch>
+  - `:checkhealth mdn` reports whether the Markdown treesitter parser is available.
+
+### Changed
+
+- Lists — nbr <nikolaus.brunner@protonmail.ch>
+  - List continuation and the `mappings.cycle_key` cycle leave lines inside code blocks alone.
+- Conceal — nbr <nikolaus.brunner@protonmail.ch>
+  - List and checkbox lines inside code blocks show their source unconcealed.
+
 ### Fixed
 
 - Checkboxes — nbr <nikolaus.brunner@protonmail.ch>
