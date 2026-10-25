@@ -2,6 +2,7 @@
 
 local Config = require("mdn.config")
 local List = require("mdn.list")
+local Syntax = require("mdn.syntax")
 local M = {}
 
 local checkbox_symbols = {
@@ -68,11 +69,12 @@ function M.render(buf)
     cursor_row = vim.api.nvim_win_get_cursor(0)[1] - 1
   end
   local visual_start, visual_end = get_visual_range(buf)
+  local code_rows = Syntax.code_rows(buf)
 
   for row, line in ipairs(lines) do
     local row_index = row - 1
     local selected = visual_start and row_index >= visual_start and row_index <= visual_end
-    if row_index ~= cursor_row and not selected then
+    if row_index ~= cursor_row and not selected and not code_rows[row_index] then
       local lcontent = List.resolve_list_content(line)
       if lcontent then
         local list_start = #lcontent.indent

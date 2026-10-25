@@ -950,3 +950,64 @@ describe("range cycle", function()
     assert.are.equal("- [~] a", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])
   end)
 end)
+
+describe("code blocks", function()
+  local buf
+  local fenced = { "- item", "```", "- code", "```" }
+
+  before_each(function()
+    buf = vim.api.nvim_create_buf(true, false)
+    vim.api.nvim_set_current_buf(buf)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, fenced)
+  end)
+
+  after_each(function()
+    if buf and vim.api.nvim_buf_is_valid(buf) then
+      pcall(vim.api.nvim_buf_delete, buf, { force = true })
+    end
+  end)
+
+  it("splits the line on Enter inside a fence", function()
+    vim.fn.cursor(3, 5)
+    List.continue("<CR>")
+    assert.are.same({ "- item", "```", "- co", "de", "```" }, vim.api.nvim_buf_get_lines(buf, 0, -1, false))
+  end)
+
+  it("continues the list on Enter outside a fence", function()
+    vim.fn.cursor(1, 5)
+    List.continue("<CR>")
+    assert.are.same({ "- it", "- em" }, vim.api.nvim_buf_get_lines(buf, 0, 2, false))
+  end)
+
+  it("leaves a fenced line alone on cycle", function()
+    vim.fn.cursor(3, 1)
+    Checkbox.cycle()
+    assert.are.equal("- code", vim.api.nvim_buf_get_lines(buf, 2, 3, false)[1])
+  end)
+
+  it("leaves a fence delimiter alone on cycle", function()
+    vim.fn.cursor(2, 1)
+    Checkbox.cycle()
+    assert.are.equal("```", vim.api.nvim_buf_get_lines(buf, 1, 2, false)[1])
+  end)
+
+  it("skips fenced lines in a range cycle", function()
+    Checkbox.cycle_range(1, 4)
+    assert.are.same({ "- [ ] item", "```", "- code", "```" }, vim.api.nvim_buf_get_lines(buf, 0, -1, false))
+  end)
+
+  it("skips fenced lines in toggle", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- [ ] item", "```", "- [ ] code", "```" })
+    vim.fn.cursor(3, 1)
+    assert.is_false(Checkbox.toggle())
+    Checkbox.toggle_range(1, 4)
+    assert.are.same({ "- [x] item", "```", "- [ ] code", "```" }, vim.api.nvim_buf_get_lines(buf, 0, -1, false))
+  end)
+
+  it("treats the line after a fence as Markdown", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "```", "code", "```", "- after" })
+    vim.fn.cursor(4, 1)
+    Checkbox.cycle()
+    assert.are.equal("- [ ] after", vim.api.nvim_buf_get_lines(buf, 3, 4, false)[1])
+  end)
+end)

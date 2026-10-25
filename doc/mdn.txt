@@ -40,6 +40,7 @@ things you miss most when editing Markdown in Neovim.
   - 5. [x] → plain bullet (done → cycle restarts); other checkbox
     chars → [x]
   - Same key works in both Normal and Insert mode
+  - Lines inside code blocks are left alone
 
 - Yank link under cursor on yl
   - Markdown link: yanks the whole link, e.g. [label](url)
@@ -62,6 +63,7 @@ things you miss most when editing Markdown in Neovim.
   - Checkbox lines replace the complete `- [state]` prefix with one symbol
   - Symbols include two spaces before the item text
   - The Markdown source remains unchanged
+  - Lines inside code blocks stay unconcealed
   - Virtual symbols remain visible with 'conceallevel' set to 3
   - Virtual symbols are hidden on the cursor line for editing
   - Visual selections (characterwise, linewise, block) reveal source on every

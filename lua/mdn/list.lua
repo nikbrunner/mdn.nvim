@@ -1,6 +1,7 @@
 ---@module 'mdn.list'
 
 local P = require("mdn.patterns")
+local Syntax = require("mdn.syntax")
 local M = {}
 
 ---@class MdnListContent
@@ -165,7 +166,10 @@ function M.continue(key)
 
   local lnum = vim.fn.line(".")
   local line = vim.api.nvim_get_current_line()
-  local lcontent = M.resolve_list_content(line)
+  local lcontent
+  if not Syntax.in_code(0, lnum - 1) then
+    lcontent = M.resolve_list_content(line)
+  end
 
   if not lcontent then
     -- Not a list item — do normal behavior

@@ -2,6 +2,7 @@
 
 local Config = require("mdn.config")
 local List = require("mdn.list")
+local Syntax = require("mdn.syntax")
 local M = {}
 
 ---Advance one line one step through the cycle.
@@ -65,6 +66,9 @@ end
 ---Works in both Normal and Insert mode.
 function M.cycle()
   local lnum = vim.fn.line(".")
+  if Syntax.in_code(0, lnum - 1) then
+    return
+  end
   local new_line, new_col = cycle_line(vim.api.nvim_get_current_line(), vim.fn.col("."))
   vim.api.nvim_set_current_line(new_line)
   vim.fn.cursor(lnum, new_col)
@@ -77,8 +81,11 @@ end
 function M.cycle_range(line1, line2)
   local buf = vim.api.nvim_get_current_buf()
   local lines = vim.api.nvim_buf_get_lines(buf, line1 - 1, line2, false)
+  local code_rows = Syntax.code_rows(buf)
   for i, line in ipairs(lines) do
-    lines[i] = cycle_line(line, 1)
+    if not code_rows[line1 + i - 2] then
+      lines[i] = cycle_line(line, 1)
+    end
   end
   vim.api.nvim_buf_set_lines(buf, line1 - 1, line2, false, lines)
 end
@@ -116,6 +123,9 @@ end
 ---Returns true if toggled, false if no checkbox was found.
 ---@return boolean
 function M.toggle()
+  if Syntax.in_code(0, vim.fn.line(".") - 1) then
+    return false
+  end
   local line = vim.api.nvim_get_current_line()
   local lcontent = List.resolve_list_content(line)
   if not lcontent then
@@ -156,12 +166,13 @@ end
 function M.toggle_range(line1, line2)
   local buf = vim.api.nvim_get_current_buf()
   local lines = vim.api.nvim_buf_get_lines(buf, line1 - 1, line2, false)
+  local code_rows = Syntax.code_rows(buf)
 
   -- Determine uniform target: if any checkbox is not checked, check all
   local all_checked = true
   local has_any_checkbox = false
-  for _, line in ipairs(lines) do
-    local lcontent = List.resolve_list_content(line)
+  for i, line in ipairs(lines) do
+    local lcontent = not code_rows[line1 + i - 2] and List.resolve_list_content(line)
     if lcontent then
       local task_state = List.get_task_state(lcontent.text)
       if task_state then
@@ -181,8 +192,8 @@ function M.toggle_range(line1, line2)
   local target = all_checked and "unchecked" or "checked"
 
   local new_lines = {}
-  for _, line in ipairs(lines) do
-    local new_line = set_checkbox(line, target)
+  for i, line in ipairs(lines) do
+    local new_line = code_rows[line1 + i - 2] and line or set_checkbox(line, target)
     table.insert(new_lines, new_line)
   end
 

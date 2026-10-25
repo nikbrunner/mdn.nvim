@@ -72,6 +72,16 @@ describe("conceal rendering", function()
     end
   end)
 
+  it("leaves list and checkbox lines inside a fence unconcealed", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- item", "```", "- [x] code", "- code", "```", "" })
+    vim.api.nvim_win_set_cursor(0, { 6, 0 })
+    Conceal.render(buf)
+
+    local marks = vim.api.nvim_buf_get_extmarks(buf, Config.conceal_ns, 0, -1, {})
+    assert.are.equal(1, #marks)
+    assert.are.equal(0, marks[1][2])
+  end)
+
   it("does not render virtual signs when conceallevel is zero", function()
     vim.wo.conceallevel = 0
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- item", "not a list" })
