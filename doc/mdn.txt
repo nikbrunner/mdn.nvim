@@ -65,7 +65,8 @@ things you miss most when editing Markdown in Neovim.
   - Anywhere else: behaves like the native |yl|
 
 - Stable Markdown rendering
-  - Valid links display as labels without a reserved trailing cell
+  - Inline links and images keep their source visible and dim the
+    (destination) part with |hl-Conceal|, so wrapped lines carry no gaps
   - Code-fence delimiters and language markers are concealed character-wise
   - Fence rows and all code payload remain visible while editing
   - Table pipes display as box-drawing lines and the header delimiter row

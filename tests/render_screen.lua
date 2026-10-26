@@ -50,10 +50,10 @@ if scenario == "link" then
   Render.render(buf)
   vim.treesitter.start(buf, "markdown")
   wait_for_screen(function()
-    return screen_text(win, 2, 9) == "labelnext"
-  end, "link never rendered without a trailing gap")
+    return screen_text(win, 6, 5) == "after"
+  end, "buffer never rendered")
 
-  equal("labelnext", screen_text(win, 2, 9))
+  equal("[label](https://example.com)next", screen_text(win, 2, 32))
   equal("       ", screen_text(win, 3, 7))
   equal("payload", screen_text(win, 4, 7))
   equal("       ", screen_text(win, 5, 7))
@@ -251,7 +251,7 @@ elseif scenario == "windows" then
     "```lua",
     "payload",
     "```",
-    "[label](https://example.com)",
+    "`code`",
     "after",
   })
   Render.render(buf)
@@ -268,17 +268,17 @@ elseif scenario == "windows" then
   end, "first window did not reveal fence source")
   assert(screen_text(first_win, 1, 28):match("```lua"))
   wait_for_screen(function()
-    return screen_text(first_win, 4, 5) == "label"
-  end, "first window did not conceal link source")
+    return screen_text(first_win, 4, 6) == "code  "
+  end, "first window did not conceal code span source")
 
   vim.api.nvim_set_current_win(second_win)
   wait_for_screen(function()
-    return screen_text(second_win, 4, 28):match("%[label%]") ~= nil
-  end, "second window did not reveal link source")
+    return screen_text(second_win, 4, 6) == "`code`"
+  end, "second window did not reveal code span source")
   wait_for_screen(function()
     return screen_text(second_win, 1, 5) == "     "
   end, "second window did not conceal fence source")
-  assert(screen_text(second_win, 4, 28):match("%[label%]"))
+  equal("`code`", screen_text(second_win, 4, 6))
 else
   error("unknown screen scenario: " .. scenario)
 end

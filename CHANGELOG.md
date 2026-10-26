@@ -13,6 +13,8 @@
 
 ### Changed
 
+- Render — nbr <nikolaus.brunner@protonmail.ch>
+  - Inline links and images show their source with the destination dimmed in `Conceal`, so wrapped lines break where the text does.
 - Lists — nbr <nikolaus.brunner@protonmail.ch>
   - List continuation and the `mappings.cycle_key` cycle leave lines inside code blocks alone.
 - Conceal — nbr <nikolaus.brunner@protonmail.ch>

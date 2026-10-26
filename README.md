@@ -13,7 +13,7 @@ Most Markdown plugins do too much. mdn.nvim does exactly a few things:
 1. **Smart list continuation** — press Enter and the next list item appears automatically
 2. **Bullet/checkbox cycle** — `<C-k>` cycles: blank → bullet → [ ] → [~] → [x] → bullet
 3. **Concealed list markers** — shows padded symbols for list items and checkbox states; keeps the current line editable
-4. **Stable Markdown rendering** — shows links as labels and hides fence markers without collapsing source rows or payload; tables draw box lines and keep cell text unconcealed so columns line up
+4. **Stable Markdown rendering** — keeps link source visible with dimmed destinations, hides fence markers without collapsing source rows or payload; tables draw box lines and keep cell text unconcealed so columns line up
 5. **Yank link** — `yl` copies the whole Markdown link, or just the URL of a bare link
 6. **Ordered list renumbering** — numbers fix themselves after you insert, delete, paste, or move items
 7. **Table fit** — cells get padded so columns line up in the source, not only in the rendered view
@@ -151,9 +151,10 @@ vim.g.mdn_config = {
 
 Set `vim.g.mdn_config` before the package manager loads the plugin.
 
-By default, valid links render without brackets, destinations, or a trailing
-reserved cell. Fenced-code delimiters and language markers are hidden while
-both fence rows and all payload remain visible. Moving a window's cursor onto a
+Inline links and images keep their source visible, so wrapped lines break where
+the text does; the `(destination)` part is drawn in `Conceal`. Fenced-code
+delimiters and language markers are hidden while both fence rows and all
+payload remain visible. Moving a window's cursor onto a
 concealed source line reveals that line; separate windows reveal independently.
 If the Markdown parser or highlight query is unavailable, mdn.nvim leaves the
 source readable without raising an error.

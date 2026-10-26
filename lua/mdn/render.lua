@@ -20,8 +20,26 @@ local fence_query_text = [[
 (pipe_table_delimiter_row) @table.delimiter
 ]]
 
+local link_query_text = [[
+(inline_link
+  [
+    "("
+    (link_destination)
+    ")"
+  ] @link.destination)
+
+(image
+  [
+    "("
+    (link_destination)
+    ")"
+  ] @link.destination)
+]]
+
 ---@type vim.treesitter.Query?
 local fence_query
+---@type vim.treesitter.Query?
+local link_query
 ---@type integer[]
 local autocmds = {}
 local highlight_query_ready = false
@@ -38,6 +56,18 @@ local function get_fence_query()
   return fence_query
 end
 
+local function get_link_query()
+  if link_query then
+    return link_query
+  end
+
+  local ok, query = pcall(vim.treesitter.query.parse, "markdown_inline", link_query_text)
+  if ok then
+    link_query = query
+  end
+  return link_query
+end
+
 local function loaded_markdown_highlighters()
   local ok, highlighter = pcall(require, "vim.treesitter.highlighter")
   if not ok then
@@ -51,6 +81,15 @@ local function loaded_markdown_highlighters()
     end
   end
   return active
+end
+
+local function restart_highlighters(bufs)
+  for _, buf in ipairs(bufs) do
+    pcall(vim.treesitter.stop, buf)
+  end
+  for _, buf in ipairs(bufs) do
+    pcall(vim.treesitter.start, buf, "markdown")
+  end
 end
 
 local function prepare_highlight_query()
@@ -82,13 +121,38 @@ local function prepare_highlight_query()
   end
 
   query.has_conceal_line = false
-  for _, buf in ipairs(active) do
-    pcall(vim.treesitter.stop, buf)
-  end
-  for _, buf in ipairs(active) do
-    pcall(vim.treesitter.start, buf, "markdown")
-  end
+  restart_highlighters(active)
   return true
+end
+
+-- Concealing a link destination leaves its width in the wrapped row, so
+-- inline links and images keep their source visible.
+local function prepare_inline_query()
+  local query = vim.treesitter.query.get("markdown_inline", "highlights")
+  if not query or not query.query or type(query.query.disable_pattern) ~= "function" then
+    return
+  end
+
+  local sample = "[a](b) ![c](d)"
+  local root = vim.treesitter.get_string_parser(sample, "markdown_inline"):parse()[1]:root()
+  local link_patterns = {}
+  for pattern, match, metadata in query:iter_matches(root, sample, 0, -1) do
+    if metadata.conceal ~= nil then
+      for id in pairs(match) do
+        if query.captures[id] == "markup.link" then
+          link_patterns[pattern] = true
+        end
+      end
+    end
+  end
+
+  if next(link_patterns) == nil then
+    return
+  end
+  for pattern in pairs(link_patterns) do
+    query.query:disable_pattern(pattern)
+  end
+  restart_highlighters(loaded_markdown_highlighters())
 end
 
 local function set_conceal(buf, row, start_col, end_col, char)
@@ -110,6 +174,32 @@ local function render_delimiter_row(buf, row)
     end
     set_conceal(buf, row, col - 1, col, symbol)
   end
+end
+
+local function render_link_destinations(buf, parser)
+  local query = get_link_query()
+  if not query then
+    return
+  end
+
+  pcall(function()
+    parser:parse(true)
+    local inline = parser:children().markdown_inline
+    if not inline then
+      return
+    end
+    for _, tree in ipairs(inline:trees()) do
+      for _, node in query:iter_captures(tree:root(), buf, 0, -1) do
+        local start_row, start_col, end_row, end_col = node:range()
+        vim.api.nvim_buf_set_extmark(buf, Config.render_ns, start_row, start_col, {
+          end_row = end_row,
+          end_col = end_col,
+          hl_group = "Conceal",
+          priority = 200,
+        })
+      end
+    end
+  end)
 end
 
 ---Apply configured rendering options to every window displaying a buffer.
@@ -169,7 +259,10 @@ function M.render(buf)
   end)
   if not ok then
     vim.api.nvim_buf_clear_namespace(buf, Config.render_ns, 0, -1)
+    return
   end
+
+  render_link_destinations(buf, parser)
 end
 
 ---Apply window options and render a Markdown buffer.
@@ -188,6 +281,7 @@ end
 ---Enable hybrid Markdown rendering.
 function M.setup()
   highlight_query_ready = prepare_highlight_query()
+  pcall(prepare_inline_query)
 
   for _, autocmd in ipairs(autocmds) do
     pcall(vim.api.nvim_del_autocmd, autocmd)
