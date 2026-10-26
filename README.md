@@ -137,7 +137,7 @@ vim.g.mdn_config = {
       concealcursor = "",        -- modes that keep conceal active on the cursor line
     },
     conceal = {
-      listitem = { pattern = "[-+*]%s", replace = " " },
+      listitem = { pattern = "[-+*]%s", replace = "• " },
       unchecked = { pattern = "%[%s%]%s", replace = "󰄱 " },
       checked = { pattern = "%[[xX]%]%s", replace = "󰄲 ", hl = "DiagnosticOk" },
       partial = { pattern = "%[~%]%s", replace = "󰡖 ", hl = "DiagnosticWarn" },

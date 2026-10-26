@@ -55,7 +55,7 @@ local defaults = {
     concealcursor = "",
   },
   conceal = {
-    listitem = { pattern = "[-+*]%s", replace = " " },
+    listitem = { pattern = "[-+*]%s", replace = "• " },
     unchecked = { pattern = "%[%s%]%s", replace = "󰄱 " },
     checked = { pattern = "%[[xX]%]%s", replace = "󰄲 ", hl = "DiagnosticOk" },
     partial = { pattern = "%[~%]%s", replace = "󰡖 ", hl = "DiagnosticWarn" },
