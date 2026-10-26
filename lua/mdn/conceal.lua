@@ -16,14 +16,14 @@ local checkbox_symbols = {
   ["-"] = "canceled",
 }
 
-local function add_mark(buf, row, start_col, end_col, symbol)
+local function add_mark(buf, row, start_col, end_col, symbol, hl)
   local opts = {
     end_col = end_col,
     conceal = "",
     priority = 200,
   }
   if symbol ~= "" then
-    opts.virt_text = { { symbol, "Conceal" } }
+    opts.virt_text = { { symbol, hl or "Conceal" } }
     opts.virt_text_pos = "inline"
   end
   vim.api.nvim_buf_set_extmark(buf, Config.conceal_ns, row, start_col, opts)
@@ -89,13 +89,13 @@ function M.render(buf)
           local rule = Config.conceal[symbol_name]
           local prefix_end = find_rule_end(line, checkbox_start, rule)
           if prefix_end then
-            add_mark(buf, row_index, prefix_start, prefix_end, rule.replace)
+            add_mark(buf, row_index, prefix_start, prefix_end, rule.replace, rule.hl)
           end
         elseif lcontent.type == "unordered" then
           local rule = Config.conceal.listitem
           local list_end = find_rule_end(line, list_start, rule)
           if list_end then
-            add_mark(buf, row_index, list_start, list_end, rule.replace)
+            add_mark(buf, row_index, list_start, list_end, rule.replace, rule.hl)
           end
         end
       end

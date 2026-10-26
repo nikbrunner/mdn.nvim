@@ -140,11 +140,11 @@ DEFAULT CONFIGURATION ~
     conceal = {
       listitem = { pattern = "[-+*]%s", replace = " " },
       unchecked = { pattern = "%[%s%]%s", replace = "󰄱 " },
-      checked = { pattern = "%[[xX]%]%s", replace = "󰄲 " },
-      partial = { pattern = "%[~%]%s", replace = "󰡖 " },
-      defer = { pattern = "%[>%]%s", replace = "󰁔 " },
-      scheduled = { pattern = "%[<%]%s", replace = "󰃰 " },
-      event = { pattern = "%[o%]%s", replace = "󰃭 " },
+      checked = { pattern = "%[[xX]%]%s", replace = "󰄲 ", hl = "DiagnosticOk" },
+      partial = { pattern = "%[~%]%s", replace = "󰡖 ", hl = "DiagnosticWarn" },
+      defer = { pattern = "%[>%]%s", replace = "󰁔 ", hl = "DiagnosticWarn" },
+      scheduled = { pattern = "%[<%]%s", replace = "󰃰 ", hl = "DiagnosticInfo" },
+      event = { pattern = "%[o%]%s", replace = "󰃭 ", hl = "DiagnosticInfo" },
       canceled = { pattern = "%[%-]%s", replace = "󱋭 " },
     },
   }
@@ -195,14 +195,18 @@ OPTIONS ~
     replace (string)
       Text displayed in place of the match, including any spacing.
 
+    hl (string, optional)
+      Highlight group for the replacement text. Rules without one use
+      |hl-Conceal|.
+
     Defaults:
       listitem  pattern "[-+*]%s", replace " "
       unchecked pattern "%[%s%]%s", replace "󰄱 "
-      checked   pattern "%[[xX]%]%s", replace "󰄲 "
-      partial   pattern "%[~%]%s", replace "󰡖 "
-      defer     pattern "%[>%]%s", replace "󰁔 "
-      scheduled pattern "%[<%]%s", replace "󰃰 "
-      event     pattern "%[o%]%s", replace "󰃭 "
+      checked   pattern "%[[xX]%]%s", replace "󰄲 ", hl "DiagnosticOk"
+      partial   pattern "%[~%]%s", replace "󰡖 ", hl "DiagnosticWarn"
+      defer     pattern "%[>%]%s", replace "󰁔 ", hl "DiagnosticWarn"
+      scheduled pattern "%[<%]%s", replace "󰃰 ", hl "DiagnosticInfo"
+      event     pattern "%[o%]%s", replace "󰃭 ", hl "DiagnosticInfo"
       canceled  pattern "%[%-]%s", replace "󱋭 "
 
     The defaults use current nf-md Nerd Font glyphs. A Nerd Font is

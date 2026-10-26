@@ -17,6 +17,7 @@
   - List continuation and the `mappings.cycle_key` cycle leave lines inside code blocks alone.
 - Conceal — nbr <nikolaus.brunner@protonmail.ch>
   - List and checkbox lines inside code blocks show their source unconcealed.
+  - Checkbox symbols take color from diagnostic groups: checked in `DiagnosticOk`, partial and defer in `DiagnosticWarn`, scheduled and event in `DiagnosticInfo`; each `conceal.<state>` rule takes an optional `hl` group.
 
 ### Fixed
 

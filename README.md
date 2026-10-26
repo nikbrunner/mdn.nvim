@@ -139,11 +139,11 @@ vim.g.mdn_config = {
     conceal = {
       listitem = { pattern = "[-+*]%s", replace = " " },
       unchecked = { pattern = "%[%s%]%s", replace = "󰄱 " },
-      checked = { pattern = "%[[xX]%]%s", replace = "󰄲 " },
-      partial = { pattern = "%[~%]%s", replace = "󰡖 " },
-      defer = { pattern = "%[>%]%s", replace = "󰁔 " },
-      scheduled = { pattern = "%[<%]%s", replace = "󰃰 " },
-      event = { pattern = "%[o%]%s", replace = "󰃭 " },
+      checked = { pattern = "%[[xX]%]%s", replace = "󰄲 ", hl = "DiagnosticOk" },
+      partial = { pattern = "%[~%]%s", replace = "󰡖 ", hl = "DiagnosticWarn" },
+      defer = { pattern = "%[>%]%s", replace = "󰁔 ", hl = "DiagnosticWarn" },
+      scheduled = { pattern = "%[<%]%s", replace = "󰃰 ", hl = "DiagnosticInfo" },
+      event = { pattern = "%[o%]%s", replace = "󰃭 ", hl = "DiagnosticInfo" },
       canceled = { pattern = "%[%-]%s", replace = "󱋭 " },
     },
 }

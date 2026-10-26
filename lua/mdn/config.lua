@@ -25,6 +25,7 @@ local M = {}
 ---@class Mdn.ConcealRule
 ---@field pattern string Lua pattern for the source text to conceal
 ---@field replace string Text shown in place of the concealed source
+---@field hl? string Highlight group for the replacement text (default: "Conceal")
 
 ---@class Mdn.ConcealOptions
 ---@field listitem Mdn.ConcealRule Rule for unordered list markers
@@ -56,11 +57,11 @@ local defaults = {
   conceal = {
     listitem = { pattern = "[-+*]%s", replace = " " },
     unchecked = { pattern = "%[%s%]%s", replace = "󰄱 " },
-    checked = { pattern = "%[[xX]%]%s", replace = "󰄲 " },
-    partial = { pattern = "%[~%]%s", replace = "󰡖 " },
-    defer = { pattern = "%[>%]%s", replace = "󰁔 " },
-    scheduled = { pattern = "%[<%]%s", replace = "󰃰 " },
-    event = { pattern = "%[o%]%s", replace = "󰃭 " },
+    checked = { pattern = "%[[xX]%]%s", replace = "󰄲 ", hl = "DiagnosticOk" },
+    partial = { pattern = "%[~%]%s", replace = "󰡖 ", hl = "DiagnosticWarn" },
+    defer = { pattern = "%[>%]%s", replace = "󰁔 ", hl = "DiagnosticWarn" },
+    scheduled = { pattern = "%[<%]%s", replace = "󰃰 ", hl = "DiagnosticInfo" },
+    event = { pattern = "%[o%]%s", replace = "󰃭 ", hl = "DiagnosticInfo" },
     canceled = { pattern = "%[%-]%s", replace = "󱋭 " },
   },
 }
@@ -111,6 +112,7 @@ function M.setup(opts)
     vim.validate("conceal." .. name, rule, "table")
     vim.validate("conceal." .. name .. ".pattern", rule.pattern, "string")
     vim.validate("conceal." .. name .. ".replace", rule.replace, "string")
+    vim.validate("conceal." .. name .. ".hl", rule.hl, "string", true)
   end
 end
 

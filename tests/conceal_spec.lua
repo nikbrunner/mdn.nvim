@@ -27,11 +27,11 @@ describe("conceal rendering", function()
     assert.are.same({
       listitem = { pattern = "[-+*]%s", replace = " " },
       unchecked = { pattern = "%[%s%]%s", replace = "󰄱 " },
-      checked = { pattern = "%[[xX]%]%s", replace = "󰄲 " },
-      partial = { pattern = "%[~%]%s", replace = "󰡖 " },
-      defer = { pattern = "%[>%]%s", replace = "󰁔 " },
-      scheduled = { pattern = "%[<%]%s", replace = "󰃰 " },
-      event = { pattern = "%[o%]%s", replace = "󰃭 " },
+      checked = { pattern = "%[[xX]%]%s", replace = "󰄲 ", hl = "DiagnosticOk" },
+      partial = { pattern = "%[~%]%s", replace = "󰡖 ", hl = "DiagnosticWarn" },
+      defer = { pattern = "%[>%]%s", replace = "󰁔 ", hl = "DiagnosticWarn" },
+      scheduled = { pattern = "%[<%]%s", replace = "󰃰 ", hl = "DiagnosticInfo" },
+      event = { pattern = "%[o%]%s", replace = "󰃭 ", hl = "DiagnosticInfo" },
       canceled = { pattern = "%[%-]%s", replace = "󱋭 " },
     }, Config.conceal)
   end)
@@ -65,9 +65,19 @@ describe("conceal rendering", function()
       Config.conceal.canceled.replace,
       Config.conceal.listitem.replace,
     }
+    local expected_hl = {
+      "Conceal",
+      "DiagnosticOk",
+      "DiagnosticWarn",
+      "DiagnosticWarn",
+      "DiagnosticInfo",
+      "DiagnosticInfo",
+      "Conceal",
+      "Conceal",
+    }
     for index, mark in ipairs(marks) do
       assert.are.equal("", mark[4].conceal)
-      assert.are.same({ { expected[index], "Conceal" } }, mark[4].virt_text)
+      assert.are.same({ { expected[index], expected_hl[index] } }, mark[4].virt_text)
       assert.are.equal("inline", mark[4].virt_text_pos)
     end
   end)
@@ -127,7 +137,7 @@ describe("conceal rendering", function()
     Config.setup({
       conceal = {
         listitem = { pattern = "%*%s", replace = "L " },
-        unchecked = { pattern = "%[%s%]%s", replace = "U " },
+        unchecked = { pattern = "%[%s%]%s", replace = "U ", hl = "Special" },
       },
     })
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "* item", "* [ ] item", "not a list" })
@@ -137,7 +147,7 @@ describe("conceal rendering", function()
     local marks = vim.api.nvim_buf_get_extmarks(buf, Config.conceal_ns, 0, -1, { details = true })
     assert.are.equal(2, #marks)
     assert.are.same({ { "L ", "Conceal" } }, marks[1][4].virt_text)
-    assert.are.same({ { "U ", "Conceal" } }, marks[2][4].virt_text)
+    assert.are.same({ { "U ", "Special" } }, marks[2][4].virt_text)
   end)
 
   it("hides virtual signs on every line in a visual block selection", function()
