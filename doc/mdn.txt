@@ -65,8 +65,7 @@ things you miss most when editing Markdown in Neovim.
   - Anywhere else: behaves like the native |yl|
 
 - Stable Markdown rendering
-  - Inline links and images keep their source visible and dim the
-    (destination) part with |hl-Conceal|, so wrapped lines carry no gaps
+  - Valid links display as labels without a reserved trailing cell
   - Code-fence delimiters and language markers are concealed character-wise
   - Fence rows and all code payload remain visible while editing
   - Table pipes display as box-drawing lines and the header delimiter row
@@ -93,7 +92,7 @@ For insert-mode line indent/outdent, use Neovim's built-in |i_CTRL-T| and
 ==============================================================================
 3. REQUIREMENTS                                        *mdn-requirements*
 
-- Neovim ≥ 0.13 (nightly)
+- Neovim ≥ 0.13 (nightly from 2026-10-31 or newer, for conceal-aware 'wrap')
 - Markdown filetype (set automatically by Neovim for .md files)
 
 ==============================================================================
@@ -180,7 +179,10 @@ OPTIONS ~
     |v:register|. Set to "" to disable.
 
   rendering.conceallevel (integer, default: 2)
-    Window-local Markdown conceal level. Accepted values are 0 through 3.
+    Window-local Markdown conceal level. Accepted values are 0 through 3;
+    0 turns conceal off and 3 also hides the table box lines. Applied with
+    |:setlocal| once per buffer in each window, so a later manual change
+    stays.
 
   rendering.concealcursor (string, default: "")
     Modes that keep conceal active on the cursor line. Use each of n, v,

@@ -50,10 +50,10 @@ if scenario == "link" then
   Render.render(buf)
   vim.treesitter.start(buf, "markdown")
   wait_for_screen(function()
-    return screen_text(win, 6, 5) == "after"
-  end, "buffer never rendered")
+    return screen_text(win, 2, 9) == "labelnext"
+  end, "link never rendered without a trailing gap")
 
-  equal("[label](https://example.com)next", screen_text(win, 2, 32))
+  equal("labelnext", screen_text(win, 2, 9))
   equal("       ", screen_text(win, 3, 7))
   equal("payload", screen_text(win, 4, 7))
   equal("       ", screen_text(win, 5, 7))
@@ -251,7 +251,7 @@ elseif scenario == "windows" then
     "```lua",
     "payload",
     "```",
-    "`code`",
+    "[label](https://example.com)",
     "after",
   })
   Render.render(buf)
@@ -268,17 +268,45 @@ elseif scenario == "windows" then
   end, "first window did not reveal fence source")
   assert(screen_text(first_win, 1, 28):match("```lua"))
   wait_for_screen(function()
-    return screen_text(first_win, 4, 6) == "code  "
-  end, "first window did not conceal code span source")
+    return screen_text(first_win, 4, 5) == "label"
+  end, "first window did not conceal link source")
 
   vim.api.nvim_set_current_win(second_win)
   wait_for_screen(function()
-    return screen_text(second_win, 4, 6) == "`code`"
-  end, "second window did not reveal code span source")
+    return screen_text(second_win, 4, 28):match("%[label%]") ~= nil
+  end, "second window did not reveal link source")
   wait_for_screen(function()
     return screen_text(second_win, 1, 5) == "     "
   end, "second window did not conceal fence source")
-  equal("`code`", screen_text(second_win, 4, 6))
+  assert(screen_text(second_win, 4, 28):match("%[label%]"))
+elseif scenario == "wrap" then
+  vim.cmd("vsplit")
+  local win = vim.api.nvim_get_current_win()
+  vim.api.nvim_win_set_width(win, 44)
+  local wo = vim.wo[win]
+  wo.wrap, wo.linebreak, wo.breakindent, wo.number = true, true, true, false
+  wo.breakindentopt = "list:-1"
+  vim.bo[buf].formatlistpat = [[^\s*\d\+\.\s\+\|^\s*[-*+]\s\+]]
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+    "top",
+    "See the [documentation page](https://example.com/a/very/long/path) for every detail you need.",
+    "- [ ] A checkbox task whose text is long enough that it has to wrap.",
+  })
+  vim.api.nvim_win_set_cursor(win, { 1, 0 })
+  Render.attach(buf)
+  Conceal.render(buf)
+  vim.treesitter.start(buf, "markdown")
+  wait_for_screen(function()
+    return screen_text(win, 2, 43) == "See the documentation page for every detail"
+  end, "link never wrapped at its concealed width")
+
+  equal("you need.", vim.trim(screen_text(win, 3, 44)))
+  equal("  that it has to wrap.", screen_text(win, 5, 22))
+
+  vim.api.nvim_win_set_cursor(win, { 2, 0 })
+  wait_for_screen(function()
+    return screen_text(win, 2, 9) == "See the ["
+  end, "cursor row never revealed link source")
 else
   error("unknown screen scenario: " .. scenario)
 end

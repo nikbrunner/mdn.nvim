@@ -1,4 +1,10 @@
 -- Mdn.nvim plugin entrypoint.
+local Config = require("mdn.config")
+if not Config.has_conceal_wrap() then
+  vim.notify(Config.conceal_wrap_requirement, vim.log.levels.ERROR, { title = "mdn.nvim" })
+  return
+end
+
 require("mdn")
 
 -- Command modules are loaded only when a command is invoked.

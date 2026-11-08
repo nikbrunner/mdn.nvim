@@ -177,7 +177,33 @@ describe("hybrid Markdown rendering", function()
     Render.setup()
   end)
 
+  it("detects conceal-aware wrap on the supported Neovim", function()
+    assert.is_true(Config.has_conceal_wrap())
+  end)
+
+  it("keeps a manual conceal change when the buffer re-enters its window", function()
+    vim.api.nvim_exec_autocmds("BufWinEnter", { buffer = buf })
+    vim.wo[original_win][0].conceallevel = 0
+
+    vim.api.nvim_exec_autocmds("BufWinEnter", { buffer = buf })
+
+    assert.are.equal(0, vim.wo[original_win].conceallevel)
+  end)
+
+  it("sets conceal options only on the Markdown window", function()
+    local global_level = vim.go.conceallevel
+    vim.go.conceallevel = 0
+    vim.w[original_win].mdn_rendering = nil
+
+    Render.apply_windows(buf)
+
+    assert.are.equal(2, vim.wo[original_win].conceallevel)
+    assert.are.equal(0, vim.go.conceallevel)
+    vim.go.conceallevel = global_level
+  end)
+
   it("applies default options from the Markdown after-ftplugin", function()
+    vim.w[original_win].mdn_rendering = nil
     vim.wo[original_win].conceallevel = 0
     vim.wo[original_win].concealcursor = "n"
 
@@ -374,42 +400,12 @@ describe("hybrid Markdown rendering", function()
     end
   end)
 
-  it("dims link and image destinations and keeps their source", function()
-    if not has_markdown_parser() then
-      return
-    end
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "[a](https://b.dev) ![c](d.png) [e]" })
-
-    Render.render(buf)
-
-    local marks = vim.api.nvim_buf_get_extmarks(buf, Config.render_ns, 0, -1, { details = true })
-    local dimmed = {}
-    for _, mark in ipairs(marks) do
-      assert.are.equal("Conceal", mark[4].hl_group)
-      assert.is_nil(mark[4].conceal)
-      dimmed[#dimmed + 1] = { mark[3], mark[4].end_col }
-    end
-    assert.are.same({ { 3, 4 }, { 4, 17 }, { 17, 18 }, { 23, 24 }, { 24, 29 }, { 29, 30 } }, dimmed)
-  end)
-
-  it("disables the inline link and image conceal patterns", function()
-    if not has_markdown_parser() then
-      return
-    end
-    local query = vim.treesitter.query.get("markdown_inline", "highlights")
-    local sample = "[a](b) ![c](d) *e*"
-    local root = vim.treesitter.get_string_parser(sample, "markdown_inline"):parse()[1]:root()
-    local concealed = {}
-    for id, _, metadata in query:iter_captures(root, sample) do
-      if metadata.conceal or (metadata[id] and metadata[id].conceal) then
-        concealed[#concealed + 1] = query.captures[id]
-      end
-    end
-    assert.are.same({ "conceal", "conceal" }, concealed)
-  end)
-
-  it("renders links as source and preserves fence and payload rows", function()
+  it("renders links without a trailing cell and preserves fence and payload rows", function()
     run_screen_scenario("link")
+  end)
+
+  it("wraps links and checkboxes at their concealed width", function()
+    run_screen_scenario("wrap")
   end)
 
   it("keeps table source unconcealed while inline conceal works elsewhere", function()

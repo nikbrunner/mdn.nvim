@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- **Breaking:** mdn.nvim does not load on Neovim builds without conceal-aware `wrap`, meaning nightlies from before 2026-10-31. — nbr <nikolaus.brunner@protonmail.ch>
+
 ### Added
 
 - Lists — nbr <nikolaus.brunner@protonmail.ch>
@@ -10,11 +14,10 @@
   - Table cells are padded to line up in the source after leaving Insert mode and after Normal-mode edits, measured by display width and keeping alignment colons; `tables.auto_fit` turns this off.
 - Health — nbr <nikolaus.brunner@protonmail.ch>
   - `:checkhealth mdn` reports whether the Markdown treesitter parser is available.
+  - `:checkhealth mdn` reports whether Neovim has conceal-aware `wrap`.
 
 ### Changed
 
-- Render — nbr <nikolaus.brunner@protonmail.ch>
-  - Inline links and images show their source with the destination dimmed in `Conceal`, so wrapped lines break where the text does.
 - Lists — nbr <nikolaus.brunner@protonmail.ch>
   - List continuation and the `mappings.cycle_key` cycle leave lines inside code blocks alone.
 - Conceal — nbr <nikolaus.brunner@protonmail.ch>
@@ -24,6 +27,9 @@
 
 ### Fixed
 
+- Rendering — nbr <nikolaus.brunner@protonmail.ch>
+  - `rendering.conceallevel` and `rendering.concealcursor` stay local to Markdown windows.
+  - A manual change to `conceallevel` or `concealcursor` stays when the buffer re-enters its window.
 - Checkboxes — nbr <nikolaus.brunner@protonmail.ch>
   - The Insert-mode `mappings.cycle_key` stays in place after completion plugins such as blink.cmp set their own buffer maps on `InsertEnter`.
 

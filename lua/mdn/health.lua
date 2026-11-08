@@ -14,10 +14,10 @@ function M.check()
 
   vim.health.ok("plugin is loaded")
 
-  if vim.fn.has("nvim-0.13") == 1 then
-    vim.health.ok("Neovim >= 0.13")
+  if require("mdn.config").has_conceal_wrap() then
+    vim.health.ok("Neovim has conceal-aware 'wrap'")
   else
-    vim.health.error("Neovim >= 0.13 is required")
+    vim.health.error(require("mdn.config").conceal_wrap_requirement)
   end
 
   local scratch = vim.api.nvim_create_buf(false, true)

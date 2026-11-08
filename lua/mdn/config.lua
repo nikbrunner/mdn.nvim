@@ -74,6 +74,15 @@ M.augroup = vim.api.nvim_create_augroup("mdn", { clear = true })
 M.ns = vim.api.nvim_create_namespace("mdn")
 M.conceal_ns = vim.api.nvim_create_namespace("mdn.conceal")
 M.render_ns = vim.api.nvim_create_namespace("mdn.render")
+M.conceal_wrap_requirement = "mdn.nvim requires a Neovim nightly from 2026-10-31 or newer for conceal-aware 'wrap'"
+
+---Whether this Neovim breaks wrapped lines at their concealed width.
+---@return boolean
+function M.has_conceal_wrap()
+  -- Conceal-aware 'wrap' has no feature flag; the documented `has_conceal` query field landed with it.
+  local ok, query = pcall(vim.treesitter.query.parse, "lua", [[(identifier) @conceal (#set! conceal "")]])
+  return ok and query.has_conceal == true
+end
 
 setmetatable(M, {
   __index = function(_, key)

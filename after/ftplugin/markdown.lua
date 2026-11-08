@@ -5,6 +5,9 @@
 local buf = vim.api.nvim_get_current_buf()
 
 local Config = require("mdn.config")
+if not Config.has_conceal_wrap() then
+  return
+end
 
 require("mdn.render").attach(buf)
 
