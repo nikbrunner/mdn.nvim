@@ -82,6 +82,59 @@ describe("conceal rendering", function()
     end
   end)
 
+  describe("horizontal rules", function()
+    local function rule_marks()
+      local marks = vim.api.nvim_buf_get_extmarks(buf, Config.conceal_ns, 0, -1, { details = true })
+      return vim.tbl_map(function(mark)
+        return { row = mark[2], col = mark[3], pos = mark[4].virt_text_pos, text = mark[4].virt_text[1][1] }
+      end, marks)
+    end
+
+    local function render(lines, cursor_row)
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+      vim.api.nvim_win_set_cursor(0, { cursor_row, 0 })
+      Conceal.render(buf)
+    end
+
+    it("overlays the configured filler from the start of the rule", function()
+      Config.setup({ rendering = { horizontal_rule = "=" } })
+      render({ "above", "", "---", "", "> ---", "", "below" }, 7)
+
+      local marks = rule_marks()
+      assert.are.equal(2, #marks)
+      assert.are.same({ 2, 0, "overlay" }, { marks[1].row, marks[1].col, marks[1].pos })
+      assert.are.same({ 4, 2, "overlay" }, { marks[2].row, marks[2].col, marks[2].pos })
+      assert.are.equal("===", marks[1].text:sub(1, 3))
+    end)
+
+    it("leaves frontmatter, setext underlines and fenced dashes alone", function()
+      render({ "---", "title: x", "---", "", "heading", "---", "", "```", "---", "```", "" }, 11)
+
+      assert.are.same({}, rule_marks())
+    end)
+
+    it("reveals the source on the cursor row", function()
+      render({ "---", "", "below" }, 1)
+
+      assert.are.same({}, rule_marks())
+    end)
+
+    it("draws nothing with conceal off", function()
+      vim.wo.conceallevel = 0
+      render({ "---", "", "below" }, 3)
+
+      assert.are.same({}, rule_marks())
+    end)
+
+    it("draws only the rule for a spaced rule that also reads as a list", function()
+      render({ "- - -", "", "below" }, 3)
+
+      local marks = rule_marks()
+      assert.are.equal(1, #marks)
+      assert.are.equal("overlay", marks[1].pos)
+    end)
+  end)
+
   it("leaves list and checkbox lines inside a fence unconcealed", function()
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "- item", "```", "- [x] code", "- code", "```", "" })
     vim.api.nvim_win_set_cursor(0, { 6, 0 })

@@ -307,6 +307,28 @@ elseif scenario == "wrap" then
   wait_for_screen(function()
     return screen_text(win, 2, 9) == "See the ["
   end, "cursor row never revealed link source")
+elseif scenario == "horizontal_rule" then
+  vim.cmd("vsplit")
+  local win = vim.api.nvim_get_current_win()
+  vim.api.nvim_win_set_width(win, 30)
+  local wo = vim.wo[win]
+  wo.wrap, wo.number, wo.conceallevel = true, false, 2
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "top", "", "---", "", ("-"):rep(70), "", "after" })
+  vim.api.nvim_win_set_cursor(win, { 1, 0 })
+  Conceal.render(buf)
+  local fill = ("╌"):rep(30)
+  wait_for_screen(function()
+    return screen_text(win, 3, 30) == fill
+  end, "rule never filled the window width")
+  equal(fill, screen_text(win, 5, 30))
+  equal((" "):rep(30), screen_text(win, 6, 30))
+  equal("after", screen_text(win, 7, 5))
+
+  vim.api.nvim_win_set_cursor(win, { 3, 0 })
+  Conceal.render(buf)
+  wait_for_screen(function()
+    return screen_text(win, 3, 30) == "---" .. (" "):rep(27)
+  end, "cursor row never revealed the rule source")
 else
   error("unknown screen scenario: " .. scenario)
 end

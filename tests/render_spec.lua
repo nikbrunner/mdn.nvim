@@ -10,7 +10,7 @@ describe("Markdown rendering configuration", function()
   it("defaults to label-only conceal away from the cursor", function()
     Config.setup()
 
-    assert.are.same({ conceallevel = 2, concealcursor = "" }, Config.rendering)
+    assert.are.same({ conceallevel = 2, concealcursor = "", horizontal_rule = "╌" }, Config.rendering)
   end)
 
   it("accepts conceal levels zero through three and valid cursor modes", function()
@@ -410,6 +410,10 @@ describe("hybrid Markdown rendering", function()
 
   it("keeps table source unconcealed while inline conceal works elsewhere", function()
     run_screen_scenario("table")
+  end)
+
+  it("fills the window with the horizontal rule and reveals it on the cursor row", function()
+    run_screen_scenario("horizontal_rule")
   end)
 
   it("reveals checkbox source across Visual Block selections", function()

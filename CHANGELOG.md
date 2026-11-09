@@ -12,6 +12,8 @@
   - Ordered lists renumber from 1 after every edit in Normal and Insert mode, each nested list counting on its own; `lists.auto_renumber` turns this off.
 - Tables — nbr <nikolaus.brunner@protonmail.ch>
   - Table cells are padded to line up in the source after leaving Insert mode and after Normal-mode edits, measured by display width and keeping alignment colons; `tables.auto_fit` turns this off.
+- Rendering — nbr <nikolaus.brunner@protonmail.ch>
+  - Horizontal rules fill the window with a dashed line; `rendering.horizontal_rule` sets the filler text.
 - Health — nbr <nikolaus.brunner@protonmail.ch>
   - `:checkhealth mdn` reports whether the Markdown treesitter parser is available.
   - `:checkhealth mdn` reports whether Neovim has conceal-aware `wrap`.

@@ -21,6 +21,7 @@ local M = {}
 ---@class Mdn.RenderingOptions
 ---@field conceallevel integer Markdown window conceal level (default: 2)
 ---@field concealcursor string Modes which keep conceal active on the cursor line (default: "")
+---@field horizontal_rule string Text repeated across the window on a horizontal rule
 
 ---@class Mdn.ConcealRule
 ---@field pattern string Lua pattern for the source text to conceal
@@ -53,6 +54,7 @@ local defaults = {
   rendering = {
     conceallevel = 2,
     concealcursor = "",
+    horizontal_rule = "╌",
   },
   conceal = {
     listitem = { pattern = "[-+*]%s", replace = "• " },
@@ -103,6 +105,7 @@ function M.setup(opts)
   vim.validate("tables.auto_fit", config.tables.auto_fit, "boolean")
   vim.validate("rendering.conceallevel", config.rendering.conceallevel, "number")
   vim.validate("rendering.concealcursor", config.rendering.concealcursor, "string")
+  vim.validate("rendering.horizontal_rule", config.rendering.horizontal_rule, "string")
   if
     config.rendering.conceallevel % 1 ~= 0
     or config.rendering.conceallevel < 0

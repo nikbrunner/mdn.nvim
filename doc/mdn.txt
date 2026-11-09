@@ -81,6 +81,8 @@ things you miss most when editing Markdown in Neovim.
   - Symbols include two spaces before the item text
   - The Markdown source remains unchanged
   - Lines inside code blocks stay unconcealed
+  - Horizontal rules fill the window with the configured text; frontmatter
+    and setext heading underlines stay as written
   - Virtual symbols remain visible with 'conceallevel' set to 3
   - Virtual symbols are hidden on the cursor line for editing
   - Visual selections (characterwise, linewise, block) reveal source on every
@@ -136,6 +138,7 @@ DEFAULT CONFIGURATION ~
     rendering = {
       conceallevel = 2,
       concealcursor = "",
+      horizontal_rule = "╌",
     },
     conceal = {
       listitem = { pattern = "[-+*]%s", replace = "• " },
@@ -188,6 +191,11 @@ OPTIONS ~
     Modes that keep conceal active on the cursor line. Use each of n, v,
     i, and c at most once. The empty default reveals source on the cursor
     line.
+
+  rendering.horizontal_rule (string, default: "╌")
+    Text repeated across the window on a horizontal rule (`---`, `***`,
+    `___`). Drawn with |hl-Conceal|. Hidden on the cursor line and in
+    Visual selections, like the list markers.
 
   conceal.<state>        (table)
     Rule for a list marker or checkbox state. Each rule contains:

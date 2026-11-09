@@ -135,6 +135,7 @@ vim.g.mdn_config = {
     rendering = {
       conceallevel = 2,          -- Markdown window conceal level (0 through 3)
       concealcursor = "",        -- modes that keep conceal active on the cursor line
+      horizontal_rule = "╌",     -- text repeated across the window on a horizontal rule
     },
     conceal = {
       listitem = { pattern = "[-+*]%s", replace = "• " },
@@ -162,6 +163,10 @@ both fence rows and all payload remain visible. Moving a window's cursor onto a
 concealed source line reveals that line; separate windows reveal independently.
 If the Markdown parser or highlight query is unavailable, mdn.nvim leaves the
 source readable without raising an error.
+
+Horizontal rules (`---`, `***`, `___`) fill the window with
+`rendering.horizontal_rule`, except on the cursor line. Frontmatter and setext
+heading underlines stay as written.
 
 ## 📖 Documentation
 

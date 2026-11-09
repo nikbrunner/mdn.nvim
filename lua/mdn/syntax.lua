@@ -12,6 +12,8 @@ local code_query_text = [[
 
 ---@type vim.treesitter.Query?
 local code_query
+---@type vim.treesitter.Query?
+local rule_query
 
 ---Parse the buffer and return the root of its Markdown tree.
 ---Parsing on every call keeps the tree current in Insert mode, where it
@@ -72,6 +74,27 @@ function M.code_rows(buf)
     end
   end
   return rows
+end
+
+---Horizontal rules, as a map of 0-indexed row to start column.
+---Empty without a parser.
+---@param buf integer Buffer id
+---@return table<integer, integer>
+function M.horizontal_rules(buf)
+  local root = M.tree(buf)
+  if not root then
+    return {}
+  end
+  if not rule_query then
+    rule_query = vim.treesitter.query.parse("markdown", "(thematic_break) @rule")
+  end
+
+  local rules = {}
+  for _, node in rule_query:iter_captures(root, buf, 0, -1) do
+    local row, col = node:range()
+    rules[row] = col
+  end
+  return rules
 end
 
 ---Whether a row lies inside a code or HTML block. False without a parser.

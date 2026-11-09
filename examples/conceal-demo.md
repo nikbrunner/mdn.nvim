@@ -26,7 +26,7 @@ Before [unfinished](https://example.com directly after.
 
 ## Inline formatting
 
-Away from the cursor these markers disappear: **bold text**, *italic text*, ~~struck text~~ and `inline code`. On the cursor line they come back.
+Away from the cursor these markers disappear: **bold text**, _italic text_, ~~struck text~~ and `inline code`. On the cursor line they come back.
 
 ## Wrapping
 
@@ -41,7 +41,7 @@ Each row should fill up to the window edge using the width you can see. The hidd
 
 Read the [installation guide](https://example.com/a/very/long/path/that/would/otherwise/eat/most/of/the/row/on/its/own) first, then the [configuration reference](https://example.com/another/very/long/path/that/would/otherwise/eat/a/row) and finally the short [changelog](https://example.com/changelog) before you open an issue.
 
-Formatting wraps the same way: this **sentence carries several bold words** and *some italic ones*, and a bit of `inline code` so the hidden markers add up across more than one row of the window.
+Formatting wraps the same way: this **sentence carries several bold words** and _some italic ones_, and a bit of `inline code` so the hidden markers add up across more than one row of the window.
 
 List items hang under their text, not under their marker. Every continuation row should start in the same column as the first word of its item.
 
@@ -73,6 +73,37 @@ Pipes draw as box lines, the delimiter row becomes a solid rule, and cell text k
 | Pending | **67%**  | [previous](https://example.com) |
 
 Move onto the delimiter row. Its source should reappear. Add characters to a cell and leave Insert mode. The cells should pad themselves so the columns line up in the source too.
+
+## Horizontal rules
+
+Move the cursor away from the rules below. Each one should draw a dashed line up to the window edge.
+
+---
+
+***
+
+___
+
+- - -
+
+> ---
+
+The next rule is longer than most windows. It should still take one row, with no raw dashes on a row below it.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Move onto a rule, or select it in Visual mode. Its source should reappear. Set `rendering.horizontal_rule` to another character to change the line.
+
+The underline of this heading stays as source, because it is not a rule:
+
+A setext heading
+---
+
+Dashes inside a code block stay as source too:
+
+```text
+---
+```
 
 ## Bullets and nested bullets
 
@@ -164,3 +195,4 @@ Open another filetype with `:new | setfiletype lua`, then check `:setlocal conce
 - A missing screen row around a code block means vertical fence conceal is active.
 - Missing payload near a closing fence means stale `conceal_lines` marks survived.
 - Source staying hidden on the cursor line means `concealcursor` is wrong.
+- A rule that stays `---` away from the cursor means the Markdown treesitter parser is missing.

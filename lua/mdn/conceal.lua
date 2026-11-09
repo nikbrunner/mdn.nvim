@@ -29,6 +29,17 @@ local function add_mark(buf, row, start_col, end_col, symbol, hl)
   vim.api.nvim_buf_set_extmark(buf, Config.conceal_ns, row, start_col, opts)
 end
 
+local function add_horizontal_rule(buf, row, col, end_col)
+  vim.api.nvim_buf_set_extmark(buf, Config.conceal_ns, row, col, {
+    end_col = end_col,
+    conceal = "",
+    -- shortcut: overlay text clips at the window edge, so one long run fills any real window; compute per window if one is ever wider.
+    virt_text = { { Config.rendering.horizontal_rule:rep(1000), "Conceal" } },
+    virt_text_pos = "overlay",
+    priority = 200,
+  })
+end
+
 local function get_visual_range(buf)
   if
     vim.api.nvim_get_current_buf() ~= buf
@@ -70,12 +81,17 @@ function M.render(buf)
   end
   local visual_start, visual_end = get_visual_range(buf)
   local code_rows = Syntax.code_rows(buf)
+  local horizontal_rules = Syntax.horizontal_rules(buf)
 
   for row, line in ipairs(lines) do
     local row_index = row - 1
     local selected = visual_start and row_index >= visual_start and row_index <= visual_end
     if row_index ~= cursor_row and not selected and not code_rows[row_index] then
-      local lcontent = List.resolve_list_content(line)
+      local rule_col = horizontal_rules[row_index]
+      if rule_col then
+        add_horizontal_rule(buf, row_index, rule_col, #line)
+      end
+      local lcontent = not rule_col and List.resolve_list_content(line)
       if lcontent then
         local list_start = #lcontent.indent
         local checkbox_char = lcontent.text:match("^%[(.)%]")
