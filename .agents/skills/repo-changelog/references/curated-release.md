@@ -10,7 +10,7 @@ log trimmed and grouped below it. The most recent curated section is the referen
 3. Trim the mechanical log: remove every entry a highlight fully covers, carrying its links into the highlight, and group the
    rest under topic roots ([`mechanical-log.md`](mechanical-log.md#topic-roots)), ordered by impact.
 4. Set the heading version to the release PR's version and the date to the release day.
-5. Run the `humanizer` skill on the highlights.
+5. Run the `nbr-voice` rewrite pass on the highlights.
 
 The curation is done when a reader who stops after the highlights knows every change worth acting on, and no entry below
 repeats a highlight.

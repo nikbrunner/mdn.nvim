@@ -27,6 +27,6 @@ curated section becomes the GitHub Release notes.
 - While a release is prepared but unpublished, new entries go into its section. `## [Unreleased]` exists only while it holds entries.
 - Every entry ends with `— Name <email>` from the committer's Git config; a breaking entry starts with `**Breaking:**`.
 - Separate release sections with `---`, with a blank line on each side. The release notes end at the first `---`.
-- Run the `humanizer` skill in embedded mode on every entry and highlight before handing it over.
+- Run the `nbr-voice` rewrite pass on every entry and highlight before handing it over.
 
 Leave the edit unstaged with the change it describes, and tell the caller what was written or which exception applies.
